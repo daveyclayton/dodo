@@ -1,4 +1,5 @@
-import { getSync } from "../shared/storage.js"
+import { fetchFromCeltraApi } from "../shared/celtraApi.js"
+import { generateScript } from "../shared/scriptGeneration.js"
 
 function toggleElement (elementId, visible) {
     const display = visible ? "block" : "none"
@@ -6,11 +7,6 @@ function toggleElement (elementId, visible) {
 }
 
 async function showEnterData () {
-    const credentials = await getSync("credentials")
-    if (!credentials) {
-        showError("Please enter your credentials in the extension options.")
-        return
-    }
     toggleElement("loading", false)
     toggleElement("script", false)
     toggleElement("error", false)
@@ -48,7 +44,7 @@ function showScript (scriptContent) {
 async function fetchCreatives (designFileId) {
     const errorMessage = `Failed to fetch creatives of Design file '${designFileId}'. Please check the ID and your permissions.`
 
-    const response = await fetch(`https://hub.celtra.io/api/creatives?returnFullUnits=1&templateBatchId=${designFileId}`)
+    const response = await fetchFromCeltraApi(`creatives?returnFullUnits=1&templateBatchId=${designFileId}`)
     if (!response.ok) {
         console.error(response.status, response.statusText)
         throw new Error(errorMessage)
@@ -74,7 +70,7 @@ async function createScript () {
     try {
         const creatives = await fetchCreatives(designFileId)
         console.log(creatives)
-        showScript(creatives.toString())
+        showScript(generateScript(creatives))
     } catch (error) {
         console.log(error)
         showError(error)
