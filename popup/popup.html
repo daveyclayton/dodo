@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="popup.css">
+    </head>
+    <body>
+        <div id="loading">
+            <div class="spinner">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinner__icon">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8 3a5 5 0 00-5 5 1 1 0 01-2 0 7 7 0 117 7 1 1 0 110-2A5 5 0 008 3z"></path>
+                </svg>
+                <div class="spinner__text">Loading...</div>
+            </div>
+        </div>
+
+        <div id="enter-data">
+            <div class="heading">Please enter the Falcon Design file ID that you want to migrate.</div>
+            <label class="popup__label">
+                <div class="popup__label-text">Design File Id</div>
+                <input class="popup__input" type="text" placeholder="Please enter the Falcon Design file ID (8 or 12 char)" id="design-file-id" />
+            </label>
+            <br/>
+            <div class="button" id="submit">Generate migration script</div>
+            <br/>
+        </div>
+
+        <div id="error">
+            <div class="heading">Oops, an error ocurred!</div>
+            <div class="error-content" id="error-content"></div>
+        </div>
+
+        <div id="script">
+            <div class="heading">Please copy this script into the development console in an empty Eagle project.</div>
+            <div>Please make sure there are no media line items present and that the brief is empty.</div>
+            <br />
+            <div class="script-content" id="script-content"></div>
+        </div>
+
+        <script type="module" src="./popup.js"></script>
+    </body>
+</html>

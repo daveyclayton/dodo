@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "BirdsOfPrey",
+    "description": "Morphing falcons into eagles.",
+    "version": "1.0",
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_icon": "assets/icon128.png"
+    },
+    "icons": {
+        "16": "assets/icon16.png",
+        "48": "assets/icon48.png",
+        "128": "assets/icon128.png"
+    },
+    "options_page": "options/options.html",
+    "permissions": [
+        "notifications",
+        "storage",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://hub.celtra.io/",
+        "https://api-eu.mixpanel.com/"
+    ]
+}
