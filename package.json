@@ -1,0 +1,22 @@
+{
+  "name": "birdsofprey",
+  "version": "0.0.1",
+  "description": "Morphing falcons into eagles.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celtra/birdsOfPrey.git"
+  },
+  "author": "Matic Tribuson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/celtra/birdsOfPrey/issues"
+  },
+  "homepage": "https://github.com/celtra/birdsOfPrey#readme",
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
+}
