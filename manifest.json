@@ -12,14 +12,12 @@
         "48": "assets/icon48.png",
         "128": "assets/icon128.png"
     },
-    "options_page": "options/options.html",
     "permissions": [
         "notifications",
         "storage",
         "tabs"
     ],
     "host_permissions": [
-        "https://hub.celtra.io/",
-        "https://api-eu.mixpanel.com/"
+        "https://hub.celtra.io/"
     ]
 }

@@ -51,7 +51,7 @@ body {
 }
 
 .popup__input {
-    width: 400px;
+    width: 480px;
 }
 
 @keyframes LOADING_CIRCLE {

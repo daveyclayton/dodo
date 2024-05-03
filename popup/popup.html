@@ -14,13 +14,18 @@
         </div>
 
         <div id="enter-data">
-            <div class="heading">Please enter the Falcon Design file ID that you want to migrate.</div>
+            <div class="heading">Please enter the Design file ID that you want to migrate.</div>
             <label class="popup__label">
                 <div class="popup__label-text">Design File Id</div>
-                <input class="popup__input" type="text" placeholder="Please enter the Falcon Design file ID (8 or 12 char)" id="design-file-id" />
+                <input class="popup__input" type="text" placeholder="Falcon Design file ID (8 or 12 char)" id="design-file-id" value="5s6es2832g1v" />
             </label>
             <br/>
-            <div class="button" id="submit">Generate migration script</div>
+            <label class="popup__label">
+                <div class="popup__label-text">Account Id</div>
+                <input class="popup__input" type="text" placeholder="Destination Account ID where an Eagle design file should be created (8 or 12 char)" id="account-id" value="ea46e583" />
+            </label>
+            <br/>
+            <div class="button" id="submit">Migrate</div>
             <br/>
         </div>
 
@@ -29,11 +34,10 @@
             <div class="error-content" id="error-content"></div>
         </div>
 
-        <div id="script">
-            <div class="heading">Please copy this script into the development console in an empty Eagle project.</div>
-            <div>Please make sure there are no media line items present and that the brief is empty.</div>
+        <div id="done">
+            <div class="heading">Eagle design file was created.</div>
             <br />
-            <div class="script-content" id="script-content"></div>
+            <div id="destination-url"></div>
         </div>
 
         <script type="module" src="./popup.js"></script>

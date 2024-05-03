@@ -50,7 +50,6 @@ module.exports = {
         "linebreak-style": ["error", "unix"],
         "max-len": 0,
         "no-array-constructor": ["error"],
-        "no-await-in-loop": ["error"],
         "no-console": "off",
         "no-constructor-return": ["error"],
         "no-duplicate-imports": ["error"],
