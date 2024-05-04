@@ -1,14 +1,19 @@
-const API_URL = "https://hub.celtra.io/api/"
-const CACHED_API_URL = "https://cache-ssl.celtra.io/api/"
+const PLATFORM_DOMAIN = "celtra.io"
+const API_URL = `https://hub.${PLATFORM_DOMAIN}/api/`
+const CACHED_API_URL = `https://cache-ssl.${PLATFORM_DOMAIN}/api/`
 
-export async function dispatch (path, method = "GET", body = null, headers = [], cached = false) {
+export async function dispatch (path, method = "GET", body = undefined, headers = [], cached = false) {
     const requestHeaders = new Headers()
     headers.forEach(header => requestHeaders.append(header[0], header[1]))
     const baseUrl = cached ? CACHED_API_URL : API_URL
-    const response = await fetch(`${baseUrl}${path}`, {
-        method,
-        headers: requestHeaders,
-    }, body ? body : undefined)
+    const response = await fetch(
+        `${baseUrl}${path}`,
+        {
+            method,
+            headers: requestHeaders,
+        },
+        body,
+    )
     if (!response.ok && !response.created) {
         let body = ""
         try {

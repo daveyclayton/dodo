@@ -6,13 +6,17 @@ import { generateId } from "./utils.js"
 const DESIGN_FILE_VERSION = 85
 const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group"]
 let orderIndexIndex = 0
-const orderIndexes = generateNOrderIndexes([], 10000)
+let orderIndexes = []
+
+function generateOrderIndexes () {
+    orderIndexes = generateNOrderIndexes([], 10000)
+}
 
 function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
     const fontTypefaceId = fonts.find(f => f.localId === fontLocalId)?.typefaceId
     const font = platformFonts.find(f => f.id === fontTypefaceId)
     if (!font.files) {
-        return "b7a39bf1e4e0a554ac7e09adf2fb67fee79526681429c0d72dd580d193b4351f" // Roboto regular
+        return "e712e715f828844e3eb493b74e3bf657b71660aa98505ce7581f7cbe889d9f83" // Roboto regular
     }
     if (font.files.ttf.blobHash) {
         return font.files.ttf.blobHash
@@ -304,20 +308,28 @@ function getMediaLineItems (creatives) {
 }
 
 function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
-    const canvasComponents = []
     let mediaLineItemIndex = 0
+    const falconComponents = []
     creatives.forEach(creative => {
         creative.units.banner.variants.forEach(variant => {
+            const creativeComponents = []
             variant.master.objects.forEach(object => {
-                const canvasComponent = getEagleComponentFromFalconComponent(object, files, fonts, platformFonts, mediaLineItemCompoundKeys)
-                if (!canvasComponent) {
-                    return
-                }
-
-                canvasComponents.push(canvasComponent)
+                creativeComponents.push(object)
             })
+            creativeComponents.sort((a, b) => b.zIndex - a.zIndex)
+            falconComponents.push(...creativeComponents)
             mediaLineItemIndex++
         })
+    })
+
+    const canvasComponents = []
+    falconComponents.forEach(falconComponent => {
+        const canvasComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+        if (!canvasComponent) {
+            return
+        }
+
+        canvasComponents.push(canvasComponent)
     })
 
     // const falconComponentsByNameAndClazz = {}
@@ -351,6 +363,7 @@ export function getFonts (creatives) {
 }
 
 export async function generateJson (creatives, platformFonts) {
+    generateOrderIndexes()
     const files = getFiles(creatives)
     const fonts = getFonts(creatives)
     const { mediaLineItems, mediaLineItemCompoundKeys } = getMediaLineItems(creatives)

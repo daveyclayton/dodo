@@ -65,13 +65,13 @@ async function createScript () {
         const creatives = await fetchCreatives(designFileId)
         const account = await fetchAccount(accountId)
         const platformFonts = await fetchFonts(accountId)
-        // const json = await generateJson(creatives, platformFonts)
-        // showDone(JSON.stringify({
-        //     designFileContent: json,
-        // }))
-        const zip = await generateZip(creatives, platformFonts)
-        const newDesignFileId = await createDesignFile(account.id, `Migrated from Falcon Design file ${designFileId} ${new Date()}`, zip)
-        showDone(getEagleDesignFileUrl(account, newDesignFileId))
+        const json = await generateJson(creatives, platformFonts)
+        showDone(JSON.stringify({
+            designFileContent: json,
+        }))
+        // const zip = await generateZip(creatives, platformFonts)
+        // const newDesignFileId = await createDesignFile(account.id, `Migrated from Falcon Design file ${designFileId} ${new Date()}`, zip)
+        // showDone(getEagleDesignFileUrl(account, newDesignFileId))
     } catch (error) {
         console.log(error)
         showError(error)

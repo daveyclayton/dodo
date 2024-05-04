@@ -3,6 +3,7 @@
 Falcon to eagle design file migration extension with quite some known limitations 😅
 
 ### TODO:
+    - presence of components
     - % to px conversion
     - anchoring?
 
