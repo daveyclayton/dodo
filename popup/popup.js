@@ -1,8 +1,6 @@
 import {
     fetchCreatives,
-    fetchAccount,
     createDesignFile,
-    getEagleDesignFileUrl,
     fetchFonts,
 } from "../shared/celtraApi.js"
 import { generateZip, generateJson } from "../shared/designFileGeneration.js"
@@ -44,10 +42,10 @@ function showDone (destinationUrl) {
     toggleElement("done", true)
 
     const destinationContentElement = document.getElementById("destination-url")
-    destinationContentElement.textContent = destinationUrl
+    destinationContentElement.href = destinationUrl
 }
 
-async function createScript () {
+async function migrate () {
     const designFileId = document.getElementById("design-file-id").value
     if (!designFileId || typeof designFileId !== "string" || designFileId.length !== 8 && designFileId.length !== 12) {
         showError("Design file ID is required and has to be 8 or 12 characters long.")
@@ -63,7 +61,6 @@ async function createScript () {
 
     try {
         const creatives = await fetchCreatives(designFileId)
-        const account = await fetchAccount(accountId)
         const platformFonts = await fetchFonts(accountId)
 
         // const json = await generateJson(creatives, platformFonts)
@@ -72,8 +69,9 @@ async function createScript () {
         // }))
 
         const zip = await generateZip(creatives, platformFonts)
-        const newDesignFileId = await createDesignFile(account.id, `Migrated from Falcon Design file ${designFileId} ${new Date()}`, zip)
-        showDone(getEagleDesignFileUrl(account, newDesignFileId))
+        const designFileName = `Migrated from Falcon Design file ${designFileId} ${new Date().toISOString().slice(0, -5)}`
+        const newDesignFileUrl = await createDesignFile(accountId, designFileName, zip)
+        showDone(newDesignFileUrl)
     } catch (error) {
         console.log(error)
         showError(error)
@@ -83,7 +81,7 @@ async function createScript () {
 showEnterData()
 document.getElementById("design-file-id").addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
-        createScript()
+        migrate()
     }
 })
-document.getElementById("submit").addEventListener("click", createScript)
+document.getElementById("submit").addEventListener("click", migrate)

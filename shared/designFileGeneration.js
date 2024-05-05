@@ -424,7 +424,7 @@ export async function generateZip (creatives, platformFonts) {
         fetchedFontBlobHashes.push(fontBlobHash)
     }
 
-    return await zip.generateAsync({ type: "blob" })
+    return await zip.generateAsync({ type: "arraybuffer" })
 }
 /* !
 

@@ -4,6 +4,7 @@ const PLATFORM_DOMAIN = "celtra.io"
 const API_URL = `https://hub.${PLATFORM_DOMAIN}/api/`
 const CACHED_API_URL = `https://cache-ssl.${PLATFORM_DOMAIN}/api/`
 const API_PROXY_URL = "https://request-passthrough-afb95a0643d0.herokuapp.com/api/"
+// const API_PROXY_URL = "https://hub.matic.test/api/"
 
 export async function dispatch (path, method = "GET", body = undefined, headers = [], cached = false) {
     const requestHeaders = new Headers()
@@ -31,8 +32,8 @@ export async function dispatch (path, method = "GET", body = undefined, headers 
         {
             method,
             headers: requestHeaders,
+            body,
         },
-        body,
     )
     if (!response.ok && !response.created) {
         let body = ""
@@ -64,7 +65,7 @@ export async function fetchCreatives (designFileId) {
     }
 }
 
-export async function fetchAccount (accountId) {
+async function fetchAccount (accountId) {
     const errorMessage = `Failed to fetch the account with id '${accountId}'. Please check the ID and your permissions.`
 
     try {
@@ -106,16 +107,31 @@ export async function fetchBlob (blobhash) {
 
 export async function createDesignFile (accountId, name, zip) {
     const errorMessage = "Failed to create the Design file. Please check your permissions."
+    // accountId = "gdrkmcjinemf" // FOR TESTING
 
     try {
-        const responseJson = await dispatch(`designFiles/upload?accountId=${accountId}&name=${name}`, "POST", zip, [["Content-Type", "application/zip"]])
-        return responseJson.id
+        const response = await dispatch(`designFiles/upload?accountId=${accountId}&name=${name}`, "POST", zip, [["Content-Type", "application/zip"]])
+        const responseJson = await response.json()
+        return await getEagleDesignFileUrl(accountId, responseJson.id)
     } catch {
         throw new Error(errorMessage)
     }
 
 }
 
-export function getEagleDesignFileUrl (account, designFileId) {
-    return `${account.clientUrl}projects/${designFileId}`
+async function getEagleDesignFileUrl (accountId, eagleCampaignId) {
+    const account = await fetchAccount(accountId)
+    const errorMessage = `Failed to fetch the design file from eagle campaign with id '${eagleCampaignId}'.`
+
+    try {
+        const response = await dispatch(`designFiles?campaignId=${eagleCampaignId}`)
+        const responseJson = await response.json()
+        if (responseJson.length === 0) {
+            throw new Error(`${errorMessage} The response was an empty array.`)
+        }
+        const designFileId = responseJson[0].id
+        return `${account.clientUrl}projects/${designFileId}`
+    } catch {
+        throw new Error(errorMessage)
+    }
 }
