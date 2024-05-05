@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="options.css">
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="heading">Please enter the Celtra CA API app details so the extension is able make authenticated requests.</div>
+            <div>You can generate an API app <a href="https://hub.celtra.io/#/apiApps" target="_blank">here</a> and read more about API apps <a href="https://support.celtra.io/ca/export-api/api-application-setup" target="_blank">here</a>.</div>
+            <br/>
+            <br/>
+            <label class="options__label">
+                <div class="options__label-text">API App ID</div>
+                <input class="options__input" type="text" placeholder="Please enter your CA API App ID" id="api-app-id" />
+            </label>
+            <br/>
+            <label class="options__label">
+                <div class="options__label-text">API App Secret</div>
+                <input class="options__input" type="text" placeholder="Please enter your CA API App secret" id="api-app-secret" />
+            </label>
+            <br/>
+            <div class="button" id="save">Save</div>
+            <br/>
+            <div id="status"></div>
+            <br/>
+            <br/>
+        </div>
+        <script type="module" src="options.js"></script>
+    </body>
+</html>

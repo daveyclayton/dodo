@@ -1,11 +1,31 @@
+import { getSync } from "./storage.js"
+
 const PLATFORM_DOMAIN = "celtra.io"
 const API_URL = `https://hub.${PLATFORM_DOMAIN}/api/`
 const CACHED_API_URL = `https://cache-ssl.${PLATFORM_DOMAIN}/api/`
+const API_PROXY_URL = "https://request-passthrough-afb95a0643d0.herokuapp.com/api/"
 
 export async function dispatch (path, method = "GET", body = undefined, headers = [], cached = false) {
     const requestHeaders = new Headers()
     headers.forEach(header => requestHeaders.append(header[0], header[1]))
-    const baseUrl = cached ? CACHED_API_URL : API_URL
+
+    let baseUrl = API_URL
+    if (cached && method === "GET") {
+        baseUrl = CACHED_API_URL
+    }
+    // The use of proxy is necessary for non-GET requests since the extension will add the origin header and CA API will reject the request.
+    if (method !== "GET") {
+        baseUrl = API_PROXY_URL
+        const credentials = await getSync("credentials")
+        if (!credentials || !credentials.apiAppId || !credentials.apiAppSecret) {
+            console.warn("Credentials not present! Cannot make a POST/PUT/PATH/DELETE request to proxy.")
+            chrome.runtime.openOptionsPage()
+            return
+        }
+        // For proxy requests, we need auth as well since cookies won't be sent.
+        requestHeaders.append("Authorization", `Basic ${btoa(`${credentials.apiAppId}:${credentials.apiAppSecret}`)}`)
+    }
+
     const response = await fetch(
         `${baseUrl}${path}`,
         {
@@ -84,11 +104,11 @@ export async function fetchBlob (blobhash) {
     }
 }
 
-export async function createDesignFile (accountId, name, json) {
+export async function createDesignFile (accountId, name, zip) {
     const errorMessage = "Failed to create the Design file. Please check your permissions."
 
     try {
-        const responseJson = await dispatch(`designFiles/upload?accountId=${accountId}&name=${name}`, "POST", json, [["Content-Type", "application/zip"]])
+        const responseJson = await dispatch(`designFiles/upload?accountId=${accountId}&name=${name}`, "POST", zip, [["Content-Type", "application/zip"]])
         return responseJson.id
     } catch {
         throw new Error(errorMessage)

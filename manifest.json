@@ -17,7 +17,9 @@
         "storage",
         "tabs"
     ],
+    "options_page": "options/options.html",
     "host_permissions": [
-        "https://hub.celtra.io/"
+        "https://hub.celtra.io/",
+        "https://request-passthrough-afb95a0643d0.herokuapp.com/"
     ]
 }

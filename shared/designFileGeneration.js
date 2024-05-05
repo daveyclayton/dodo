@@ -403,14 +403,25 @@ export async function generateZip (creatives, platformFonts) {
     const zip = new JSZip()
     zip.file("designFile.json", JSON.stringify(json))
 
+    const fetchedFileBlobHashes = []
     for (const file of files) {
+        if (fetchedFileBlobHashes.includes(file.blobHash)) {
+            continue
+        }
         const blob = await fetchBlob(file.blobHash)
         zip.file(`blobs/${file.blobHash}`, blob.blob())
+        fetchedFileBlobHashes.push(file.blobHash)
     }
+
+    const fetchedFontBlobHashes = []
     for (const font of fonts) {
         const fontBlobHash = getPlatformFontBlobHash(font.localId, fonts, platformFonts)
+        if (fetchedFontBlobHashes.includes(fontBlobHash)) {
+            continue
+        }
         const blob = await fetchBlob(fontBlobHash)
         zip.file(`fonts/${fontBlobHash}`, blob.blob())
+        fetchedFontBlobHashes.push(fontBlobHash)
     }
 
     return await zip.generateAsync({ type: "blob" })

@@ -1,0 +1,16 @@
+@import "../shared/common.css";
+
+.options__label {
+    width: 350px;
+    display: flex;
+    margin: auto;
+}
+
+.options__label-text {
+    width: 110px;
+    line-height: 22px;
+}
+
+.options__input {
+    width: 240px;
+}
