@@ -32,20 +32,37 @@ function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
     }
 }
 
-function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys = []) {
-    const getFloat = function (falconNumberString) {
-        if (parseFloat(falconNumberString) === falconNumberString) {
-            return falconNumberString
-        }
-        return parseFloat(falconNumberString.replace("px", ""))
+function getFloat (falconNumberString) {
+    if (parseFloat(falconNumberString) === falconNumberString) {
+        return falconNumberString
     }
-    const getInt = function (falconNumberString) {
-        if (parseInt(falconNumberString) === falconNumberString) {
-            return falconNumberString
-        }
-        return parseInt(falconNumberString.replace("px", ""))
+    return parseFloat(falconNumberString.replace("px", ""))
+}
+
+function getInt (falconNumberString) {
+    if (parseInt(falconNumberString) === falconNumberString) {
+        return falconNumberString
     }
 
+    return parseInt(falconNumberString.replace("px", ""))
+}
+
+function convertPercentToPx (numberString, parentSizeInPx, allowFloat = true) {
+    let number = null
+    if (numberString.endsWith("%")) {
+        number = numberString.replace("%", "") / 100 * parentSizeInPx
+    } else {
+        number = getFloat(numberString)
+    }
+
+    if (allowFloat) {
+        return number
+    } else {
+        return Math.round(number)
+    }
+}
+
+function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys = []) {
     const eagleComponent = {
         id: generateId(),
         name: falconComponent.name,
@@ -69,10 +86,17 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     }
 
     const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
-    eagleComponent.attributes.x = generatePropertyObject(getFloat(layoutSpecificValue.position.left), mediaLineItemCompoundKeys)
-    eagleComponent.attributes.y = generatePropertyObject(getFloat(layoutSpecificValue.position.top), mediaLineItemCompoundKeys)
-    eagleComponent.attributes.width = generatePropertyObject(getFloat(layoutSpecificValue.size.width), mediaLineItemCompoundKeys)
-    eagleComponent.attributes.height = generatePropertyObject(getFloat(layoutSpecificValue.size.height), mediaLineItemCompoundKeys)
+
+    // TODO: Take into account parent size not always canvas size when taking groups into account
+    const x = convertPercentToPx(layoutSpecificValue.position.left, falconComponent.canvasSize.width)
+    const y = convertPercentToPx(layoutSpecificValue.position.top, falconComponent.canvasSize.height)
+    const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.canvasSize.width, false)
+    const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.canvasSize.height, false)
+
+    eagleComponent.attributes.x = generatePropertyObject(x, mediaLineItemCompoundKeys)
+    eagleComponent.attributes.y = generatePropertyObject(y, mediaLineItemCompoundKeys)
+    eagleComponent.attributes.width = generatePropertyObject(width, mediaLineItemCompoundKeys)
+    eagleComponent.attributes.height = generatePropertyObject(height, mediaLineItemCompoundKeys)
     eagleComponent.attributes.rotation = generatePropertyObject(layoutSpecificValue.rotation, mediaLineItemCompoundKeys)
     eagleComponent.attributes.opacity = generatePropertyObject(layoutSpecificValue.opacity, mediaLineItemCompoundKeys)
 
@@ -331,7 +355,13 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
         creative.units.banner.variants.forEach(variant => {
             const creativeComponents = []
             variant.master.objects.forEach(object => {
-                creativeComponents.push(object)
+                creativeComponents.push({
+                    ...object,
+                    canvasSize: {
+                        width: variant.layouts[0].designTimeSize.width,
+                        height: variant.layouts[0].designTimeSize.height,
+                    },
+                })
             })
             creativeComponents.sort((a, b) => b.zIndex - a.zIndex)
             falconComponents.push(...creativeComponents)
