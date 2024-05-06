@@ -98,8 +98,8 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             decoration: generatePropertyObject(null),
             transform: generatePropertyObject(null),
             fill: generatePropertyObject(falconComponent.textColor, mediaLineItemCompoundKeys),
-            strokeFill: generatePropertyObject(falconComponent.textStrokeColor ?? null, mediaLineItemCompoundKeys),
-            strokeWidth: generatePropertyObject(falconComponent.textStrokeSize ?? null, mediaLineItemCompoundKeys),
+            strokeFill: generatePropertyObject(falconComponent.textStroke ? falconComponent.textStrokeColor : null, mediaLineItemCompoundKeys),
+            strokeWidth: generatePropertyObject(falconComponent.textStroke ? falconComponent.textStrokeSize : null, mediaLineItemCompoundKeys),
             strokePosition: generatePropertyObject("inside", mediaLineItemCompoundKeys),
             highlightFill: generatePropertyObject(null),
             highlightLeftPadding: generatePropertyObject(0),
@@ -116,7 +116,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.paddingBottom = generatePropertyObject(falconComponent.textPaddingBottom ?? 0, mediaLineItemCompoundKeys)
         eagleComponent.attributes.paddingLeft = generatePropertyObject(falconComponent.textPaddingLeft ?? 0, mediaLineItemCompoundKeys)
         eagleComponent.attributes.paddingRight = generatePropertyObject(falconComponent.textPaddingRight ?? 0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shrinkToFit = generatePropertyObject(false)
+        eagleComponent.attributes.shrinkToFit = generatePropertyObject(falconComponent.responsiveFont)
         eagleComponent.attributes.resizingWidth = generatePropertyObject("hugContent")
         eagleComponent.attributes.resizingHeight = generatePropertyObject("hugContent")
         eagleComponent.attributes.textDirection = generatePropertyObject("auto")
