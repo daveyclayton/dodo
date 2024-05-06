@@ -12,3 +12,4 @@ Falcon to eagle design file migration extension with quite some known limitation
     - No Animations
     - No Highlight styles
     - No letterSpacing
+    - No blending
