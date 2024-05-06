@@ -107,7 +107,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             highlightTopPadding: generatePropertyObject(0),
             highlightBottomPadding: generatePropertyObject(0),
             highlightBorderRadius: generatePropertyObject(0),
-            appleFontTracking: generatePropertyObject(false, mediaLineItemCompoundKeys),
+            appleFontTracking: generatePropertyObject(falconComponent.useAppleFontTrackingValue, mediaLineItemCompoundKeys),
             fontBlobHash: generatePropertyObject(platformFontBlobHash),
         }
 
