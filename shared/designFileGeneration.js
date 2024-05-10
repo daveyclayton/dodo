@@ -276,7 +276,6 @@ function getEagleFormatFromFalconClazz (clazz) {
 }
 
 function getFurniture (format, creative) {
-    debugger
     switch (format) {
     case "image":
     case "video":
