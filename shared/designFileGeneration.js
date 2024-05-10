@@ -32,6 +32,10 @@ function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
     }
 }
 
+function getVariants (creative) {
+    return creative.units.banner.variants ?? [creative.units.banner]
+}
+
 function getFloat (falconNumberString) {
     if (parseFloat(falconNumberString) === falconNumberString) {
         return falconNumberString
@@ -251,7 +255,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.paddingRight = generatePropertyObject(0, mediaLineItemCompoundKeys)
         break
     default:
-        null
+        return null
     }
 
     return eagleComponent
@@ -296,85 +300,266 @@ function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultV
     return propertyObject
 }
 
-function getMediaLineItems (creatives) {
-    const getEagleFormatFromFalconClazz = function (clazz) {
-        // TODO: branch out facebook formats
-        switch (clazz) {
-        case "ExportableImage":
-        case "FacebookPhotoAdPost":
-            return "Image"
-        case "FacebookVideoAdPost":
-        case "ExportableVideo":
-            return "Video"
-        case "ExportableFastLoadingAnimatedBanner":
-            return "HTML"
-        default:
-            throw new Error(`Unsupported creative format: '${clazz}'.`)
+function getEagleDesignUnitFormatFromFalconClazz (clazz) {
+    switch (clazz) {
+    case "ExportableImage":
+    case "FacebookPhotoAdPost":
+    case "PinterestStaticPin":
+        return "Image"
+    case "ExportableVideo":
+    case "FacebookVideoAdPost":
+    case "PinterestStandardWidthVideoPin":
+    case "YouTubeBumperAds":
+    case "YouTubeTrueView":
+        return "Video"
+    case "ExportableFastLoadingAnimatedBanner":
+        return "HTML"
+    default:
+        throw new Error(`Unsupported creative format: '${clazz}'.`)
+    }
+}
+
+function getEagleFormatFromFalconClazz (clazz) {
+    switch (clazz) {
+    case "ExportableImage":
+    case "PinterestStaticPin":
+        return "Image"
+    case "FacebookPhotoAdPost":
+        return "meta.image"
+    case "ExportableVideo":
+    case "PinterestStandardWidthVideoPin":
+        return "Video"
+    case "FacebookVideoAdPost":
+        return "meta.video"
+    case "YouTubeBumperAds":
+    case "YouTubeTrueView":
+        return "youtube.video"
+    case "ExportableFastLoadingAnimatedBanner":
+        return "HTML"
+    default:
+        throw new Error(`Unsupported creative format: '${clazz}'.`)
+    }
+}
+
+function getFurniture (format) {
+    switch (format) {
+    case "image":
+    case "video":
+    case "html":
+        return {}
+    case "meta.image":
+    case "meta.video":
+        return {
+            primaryText: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            headline: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            description: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            callToAction: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            websiteUrl: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            displayLink: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            deeplink: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+        }
+    case "youtube.video":
+        return {
+            title: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+            description: {
+                type: "Text",
+                text: {
+                    markedForScaling: false,
+                    values: {
+                        default: "",
+                    },
+                    dependsOn: "content",
+                    dimensions: [],
+                },
+            },
+        }
+    default:
+        throw new Error(`Unsupported creative format: '${format}'.`)
+    }
+}
+
+function getMediaLineItem (format, designUnitFormat, name, width, height, duration) {
+    const designUnitFormatLowercase = designUnitFormat.toLowerCase()
+    let mediaLineItemPath = designUnitFormatLowercase
+    const mediaLineItem = {
+        id: generateId(),
+        name,
+        attributes: {},
+        orderIndex: orderIndexes[orderIndexIndex++],
+        groupOrderIndex: orderIndexes[orderIndexIndex++],
+        productCatalogMetadata: null,
+        formatRegistrationId: `com.celtra.${format}`,
+        root: {
+            type: "Group",
+            children: {},
+        },
+    }
+
+    const designUnit = {
+        type: designUnitFormat,
+        width,
+        height,
+        aspectRatioLocked: false,
+    }
+
+    if (designUnitFormatLowercase !== "image") {
+        designUnit.duration = duration
+        designUnit.fps = 30
+    }
+
+    if (designUnitFormatLowercase === "html") {
+        designUnit.fallbackImageSource = "Generated"
+        mediaLineItem.root.children.fallbackImage = {
+            type: "File",
+            file: {
+                dependsOn: "content",
+                dimensions: [],
+                markedForScaling: false,
+                values: {
+                    default: null,
+                },
+            },
+        }
+        mediaLineItem.root.children.fallbackTimestamp = {
+            type: "Number",
+            number: {
+                dependsOn: "content",
+                dimensions: [],
+                markedForScaling: false,
+                values: {
+                    default: 0,
+                },
+            },
         }
     }
 
+    // Meta supports alternative placements so the structure is different
+    if (format.startsWith("meta.")) {
+        mediaLineItem.root.children.placements = {
+            type: "Group",
+            children: {
+                default: {
+                    type: "Group",
+                    children: {
+                        [designUnitFormatLowercase]: designUnit,
+                    },
+                },
+            },
+        }
+        mediaLineItemPath = `placements.default.${designUnitFormatLowercase}`
+    } else {
+        mediaLineItem.root.children[designUnitFormatLowercase] = designUnit
+    }
+
+    const furniture = getFurniture(format)
+    if (furniture) {
+        mediaLineItem.root.children = {
+            ...furniture,
+            ...mediaLineItem.root.children,
+        }
+    }
+
+    return {
+        mediaLineItem,
+        mediaLineItemPath,
+    }
+}
+
+function getMediaLineItems (creatives) {
     const mediaLineItems = []
     const mediaLineItemCompoundKeys = []
 
     creatives.forEach(creative => {
-        const format = getEagleFormatFromFalconClazz(creative.clazz)
-        creative.units.banner.variants.forEach(variant => {
-            const formatLowerCase = format.toLowerCase()
+        const designUnitFormat = getEagleDesignUnitFormatFromFalconClazz(creative.clazz)
+        const format = getEagleFormatFromFalconClazz(creative.clazz).toLowerCase()
+        getVariants(creative).forEach(variant => {
             const width = variant.layouts[0].designTimeSize.width
             const height = variant.layouts[0].designTimeSize.height
+            const duration = designUnitFormat === "image" ? null : variant.master.scenes[0].duration * 1000
             const name = `${creative.name} ${width}x${height}`
-            const mediaLineItem = {
-                id: generateId(),
-                name,
-                attributes: {},
-                orderIndex: orderIndexes[orderIndexIndex++],
-                groupOrderIndex: orderIndexes[orderIndexIndex++],
-                productCatalogMetadata: null,
-                formatRegistrationId: `com.celtra.${formatLowerCase}`,
-                root: {
-                    type: "Group",
-                    children: {
-                        [formatLowerCase]: {
-                            type: format,
-                            width,
-                            height,
-                            aspectRatioLocked: false,
-                        },
-                    },
-                },
-            }
-            if (format !== "Image") {
-                const duration = variant.master.scenes[0].duration * 1000
-                mediaLineItem.root.children[formatLowerCase].duration = duration
-                mediaLineItem.root.children[formatLowerCase].fps = 30
-            }
-            if (format === "HTML") {
-                mediaLineItem.root.children[formatLowerCase].fallbackImageSource = "Generated"
-                mediaLineItem.root.children.fallbackImage = {
-                    type: "File",
-                    file: {
-                        dependsOn: "content",
-                        dimensions: [],
-                        markedForScaling: false,
-                        values: {
-                            default: null,
-                        },
-                    },
-                }
-                mediaLineItem.root.children.fallbackTimestamp = {
-                    type: "Number",
-                    number: {
-                        dependsOn: "content",
-                        dimensions: [],
-                        markedForScaling: false,
-                        values: {
-                            default: 0,
-                        },
-                    },
-                }
-            }
+            const { mediaLineItem, mediaLineItemPath } = getMediaLineItem(format, designUnitFormat, name, width, height, duration)
             mediaLineItems.push(mediaLineItem)
-            mediaLineItemCompoundKeys.push(`${mediaLineItem.id}/${formatLowerCase}`)
+            mediaLineItemCompoundKeys.push(`${mediaLineItem.id}/${mediaLineItemPath}`)
         })
     })
 
@@ -388,7 +573,7 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
     let mediaLineItemIndex = 0
     const falconComponents = []
     creatives.forEach(creative => {
-        creative.units.banner.variants.forEach(variant => {
+        getVariants(creative).forEach(variant => {
             const creativeComponents = []
             variant.master.objects.forEach(object => {
                 creativeComponents.push({
@@ -479,6 +664,7 @@ export async function generateJson (creatives, platformFonts) {
 
 export async function generateZip (creatives, platformFonts) {
     const json = await generateJson(creatives, platformFonts)
+    console.log(json)
     const files = getFiles(creatives)
     const fonts = getFonts(creatives)
     const zip = new JSZip()
