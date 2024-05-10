@@ -4,8 +4,8 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
-# TODO:
-    - support all major Falcon formats
+# TODO
+    - support transferring furniture
     - components of same name and clazz should be the same component in eagle
     - anchoring?
     - handling of choice components (once they are supported in eagle)
@@ -18,11 +18,11 @@ The extension is not (yet) published on Chrome Web Store. You can clone the [rep
 4. Click the Load unpacked button and point to the directory where you unpacked the zip (or cloned the repository).
 5. For the best experience, pin the extension to your taskbar.
 
-Image representation of the steps:
-![Steps 1, 2, 3, and 4](https://github.com/celtra/birdsOfPrey/blob/master/assets/install_extension.png)
 Steps 1, 2, 3, and 4.
-![Steps 5](https://github.com/celtra/birdsOfPrey/blob/master/assets/pin_to_taskbar.png)
+![Steps 1, 2, 3, and 4](https://github.com/celtra/birdsOfPrey/blob/master/assets/install_extension.png)
+
 Step 5.
+![Steps 5](https://github.com/celtra/birdsOfPrey/blob/master/assets/pin_to_taskbar.png)
 
 # Usage
 1. Install the extension.
