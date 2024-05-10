@@ -62,20 +62,17 @@ async function migrate () {
     const designFileId = document.getElementById("design-file-id").value
     const accountId = document.getElementById("account-id").value
 
-    const validateId = (id, entityName) => {
-        if (!id || typeof id !== "string" || id.length !== 8 && id.length !== 12) {
-            showError(`${entityName} ID is required and has to be 8 or 12 characters long.`)
-            return false
-        }
-        return true
+    const isIdValid = (id) => {
+        return id && typeof id === "string" && (id.length === 8 || id.length === 12)
     }
 
-    if (!validateId(designFileId, "Design file") || !validateId(accountId, "Account")) {
+    if (!isIdValid(designFileId) || !isIdValid(accountId)) {
+        showError("Account and Design File IDs are required and have to be 8 or 12 characters long.")
         return
     }
-    showLoading()
 
     try {
+        showLoading()
         const creatives = await fetchCreatives(designFileId)
         const falconDesignFile = await fetchFalconDesignFile(designFileId)
         const platformFonts = await fetchFonts(falconDesignFile.accountId)
