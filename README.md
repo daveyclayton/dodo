@@ -19,6 +19,7 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 
 ### Known limitations:
     - No Animations
+    - No Feeds
     - No Highlight styles
     - No letterSpacing
-    - No auto-layout
+    - No Auto-layout
