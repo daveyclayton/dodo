@@ -1,7 +1,9 @@
 /* eslint-disable no-case-declarations */
 import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
-import { generateId } from "./utils.js"
+import { generateId, getInt, convertPercentToPx } from "./utils.js"
+import { getVariants, getPlatformFontBlobHash, getFiles, getFonts } from "./falconUtils.js"
+import { generatePropertyObject } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
 const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group"]
@@ -10,60 +12,6 @@ let orderIndexes = []
 
 function generateOrderIndexes () {
     orderIndexes = generateNOrderIndexes([], 5000)
-}
-
-function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
-    const fontTypefaceId = fonts.find(f => f.localId === fontLocalId)?.typefaceId
-    const font = platformFonts.find(f => f.id === fontTypefaceId)
-    if (!font.files) {
-        return "e712e715f828844e3eb493b74e3bf657b71660aa98505ce7581f7cbe889d9f83" // Roboto regular
-    }
-    if (font.files.ttf.blobHash) {
-        return font.files.ttf.blobHash
-    }
-    if (font.files.otf.blobHash) {
-        return font.files.otf.blobHash
-    }
-    if (font.files.woff.blobHash) {
-        return font.files.woff.blobHash
-    }
-    if (font.files.woff2.blobHash) {
-        return font.files.woff2.blobHash
-    }
-}
-
-function getVariants (creative) {
-    return creative.units.banner.variants ?? [creative.units.banner]
-}
-
-function getFloat (falconNumberString) {
-    if (parseFloat(falconNumberString) === falconNumberString) {
-        return falconNumberString
-    }
-    return parseFloat(falconNumberString.replace("px", ""))
-}
-
-function getInt (falconNumberString) {
-    if (parseInt(falconNumberString) === falconNumberString) {
-        return falconNumberString
-    }
-
-    return parseInt(falconNumberString.replace("px", ""))
-}
-
-function convertPercentToPx (numberString, parentSizeInPx, allowFloat = true) {
-    let number = null
-    if (numberString.endsWith("%")) {
-        number = numberString.replace("%", "") / 100 * parentSizeInPx
-    } else {
-        number = getFloat(numberString)
-    }
-
-    if (allowFloat) {
-        return number
-    } else {
-        return Math.round(number)
-    }
 }
 
 function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys = []) {
@@ -284,20 +232,6 @@ function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, p
     }
 
     return eagleComponents
-}
-
-function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null) {
-    const propertyObject = {
-        markedForScaling: false,
-        dependsOn: "canvas",
-        values: {
-            default: defaultValue ?? value,
-        },
-    }
-    mediaLineItemCompoundKeys.forEach(key => {
-        propertyObject.values[key] = value
-    })
-    return propertyObject
 }
 
 function getEagleDesignUnitFormatFromFalconClazz (clazz) {
@@ -610,24 +544,6 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
     return canvasComponents
 }
 
-export function getFiles (creatives) {
-    const files = []
-    creatives.forEach(creative => {
-        files.push(...creative.files)
-    })
-
-    return files
-}
-
-export function getFonts (creatives) {
-    const fonts = []
-    creatives.forEach(creative => {
-        fonts.push(...creative.fonts)
-    })
-
-    return fonts
-}
-
 export async function generateJson (creatives, platformFonts) {
     generateOrderIndexes()
     const files = getFiles(creatives)
@@ -664,7 +580,6 @@ export async function generateJson (creatives, platformFonts) {
 
 export async function generateZip (creatives, platformFonts) {
     const json = await generateJson(creatives, platformFonts)
-    console.log(json)
     const files = getFiles(creatives)
     const fonts = getFonts(creatives)
     const zip = new JSZip()
@@ -693,6 +608,7 @@ export async function generateZip (creatives, platformFonts) {
 
     return await zip.generateAsync({ type: "arraybuffer" })
 }
+
 /* !
 
 COPIED HERE FOR CONVENIENCE, FIND A BETTER WAY TO IMPORT THIS!
