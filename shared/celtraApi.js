@@ -1,4 +1,5 @@
 import { getSync } from "./storage.js"
+import { getCredentials } from "./utils.js"
 
 const PLATFORM_DOMAIN = "celtra.io"
 const API_URL = `https://hub.${PLATFORM_DOMAIN}/api/`
@@ -17,15 +18,10 @@ export async function dispatch (path, method = "GET", body = undefined, headers 
     // The use of proxy is necessary for non-GET requests since the extension will add the origin header and CA API will reject the request.
     if (method !== "GET") {
         baseUrl = API_PROXY_URL
-        const credentials = await getSync("credentials")
-        if (!credentials || !credentials.apiAppId || !credentials.apiAppSecret) {
-            console.warn("Credentials not present! Cannot make a POST/PUT/PATH/DELETE request to proxy.")
-            chrome.runtime.openOptionsPage()
-            return
-        }
-        // For proxy requests, we need auth as well since cookies won't be sent.
-        requestHeaders.append("Authorization", `Basic ${btoa(`${credentials.apiAppId}:${credentials.apiAppSecret}`)}`)
     }
+    // For proxy requests, we need auth as well since cookies won't be sent.
+    const credentials = await getCredentials()
+    requestHeaders.append("Authorization", `Basic ${btoa(`${credentials.apiAppId}:${credentials.apiAppSecret}`)}`)
 
     const response = await fetch(
         `${baseUrl}${path}`,

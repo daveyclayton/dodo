@@ -4,6 +4,7 @@ import {
     fetchFonts,
 } from "../shared/celtraApi.js"
 import { generateZip, generateJson } from "../shared/designFileGeneration.js"
+import { getCredentials } from "../shared/utils.js"
 
 function toggleElement (elementId, visible) {
     const display = visible ? "block" : "none"
@@ -78,6 +79,7 @@ async function migrate () {
     }
 }
 
+getCredentials()
 showEnterData()
 document.getElementById("design-file-id").addEventListener("keypress", function (e) {
     if (e.key === "Enter") {

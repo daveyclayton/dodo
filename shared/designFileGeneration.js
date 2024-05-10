@@ -81,17 +81,16 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             resizingHeight: generatePropertyObject("fixed"),
             blur: generatePropertyObject(null),
             orderIndex: generatePropertyObject(orderIndexes[orderIndexIndex++], mediaLineItemCompoundKeys),
-            parentId: generatePropertyObject(null), // TODO: change when adding group handling
+            parentId: generatePropertyObject(falconComponent.parentId ?? null),
         },
     }
 
     const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
 
-    // TODO: Take into account parent size not always canvas size when taking groups into account
-    const x = convertPercentToPx(layoutSpecificValue.position.left, falconComponent.canvasSize.width)
-    const y = convertPercentToPx(layoutSpecificValue.position.top, falconComponent.canvasSize.height)
-    const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.canvasSize.width, false)
-    const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.canvasSize.height, false)
+    const x = convertPercentToPx(layoutSpecificValue.position.left, falconComponent.parentSize.width)
+    const y = convertPercentToPx(layoutSpecificValue.position.top, falconComponent.parentSize.height)
+    const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false)
+    const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false)
 
     eagleComponent.attributes.x = generatePropertyObject(x, mediaLineItemCompoundKeys)
     eagleComponent.attributes.y = generatePropertyObject(y, mediaLineItemCompoundKeys)
@@ -227,8 +226,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             y: "center",
         }, mediaLineItemCompoundKeys)
 
-        // TODO: check if that fileLocalId reference is correct for VideoAsset components
-        if (falconComponent.fileLocalId) {
+        if (falconComponent.videoLocalId) {
             const file = files.find(f => f.localId === falconComponent.videoLocalId)
             eagleComponent.attributes.video = generatePropertyObject({
                 name: file?.name,
@@ -237,13 +235,44 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         }
         break
     case "Group":
-        // TODO: add handling for Group
+        eagleComponent.type = "Group"
+        eagleComponent.attributes.fill = generatePropertyObject(falconComponent.backgroundColor, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.overflow = generatePropertyObject("hidden")
+        eagleComponent.attributes.layout = generatePropertyObject("manual")
+        eagleComponent.attributes.spacing = generatePropertyObject(10)
+        eagleComponent.attributes.alignment = generatePropertyObject("top-left")
+        eagleComponent.attributes.paddingTop = generatePropertyObject(0, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.paddingBottom = generatePropertyObject(0, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.paddingLeft = generatePropertyObject(0, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.paddingRight = generatePropertyObject(0, mediaLineItemCompoundKeys)
         break
     default:
         null
     }
 
     return eagleComponent
+}
+
+function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys = []) {
+    const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+    const eagleComponents = [eagleComponent]
+    if (falconComponent.clazz === "Group") {
+        falconComponent.content.objects.forEach(object => {
+            // Add info about the parent
+            const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
+            const falconComponentWithParentInfo = {
+                ...object,
+                parentSize: {
+                    width: convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false),
+                    height: convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false),
+                },
+                parentId: eagleComponent.id,
+            }
+            eagleComponents.push(...getEagleComponentsFromFalconComponent(falconComponentWithParentInfo, files, fonts, platformFonts, mediaLineItemCompoundKeys))
+        })
+    }
+
+    return eagleComponents
 }
 
 function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null) {
@@ -357,7 +386,7 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
             variant.master.objects.forEach(object => {
                 creativeComponents.push({
                     ...object,
-                    canvasSize: {
+                    parentSize: {
                         width: variant.layouts[0].designTimeSize.width,
                         height: variant.layouts[0].designTimeSize.height,
                     },
@@ -371,12 +400,11 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
 
     const canvasComponents = []
     falconComponents.forEach(falconComponent => {
-        const canvasComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
-        if (!canvasComponent) {
-            return
-        }
-
-        canvasComponents.push(canvasComponent)
+        const eagleCanvasComponents = getEagleComponentsFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+        const eligibleComponents = eagleCanvasComponents.filter(c => !!c)
+        canvasComponents.push(...eligibleComponents)
+        console.log(eligibleComponents)
+        console.log(canvasComponents)
     })
 
     // const falconComponentsByNameAndClazz = {}

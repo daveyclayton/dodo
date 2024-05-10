@@ -4,12 +4,12 @@ Falcon to eagle design file migration extension with quite some known limitation
 
 ### TODO:
     - presence of components
-    - % to px conversion
     - handling of groups
     - anchoring?
+    - handling of choice components (once they are supported in eagle)
 
 ### Known limitations:
     - No Animations
     - No Highlight styles
     - No letterSpacing
-    - No blending
+    - No auto-layout
