@@ -10,11 +10,11 @@ Falcon to Eagle Design File migration extension with quite some known limitation
     - handling of choice components (once they are supported in eagle)
 
 # Installation
-The extension is not (yet) published on Chrome Web Store. You can clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) or download the ZIP & unpack it locally (studio) and manually install the extension by following these steps:
+The extension is not (yet) published on Chrome Web Store. You can clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) or download the ZIP (studio) and manually install the extension by following these steps:
 1. Open Google Chrome browser.
 2. Navigate to `chrome://extensions`
 3. Make sure that Developer mode is turned on.
-4. Click the Load unpacked button and point to the directory where you unpacked the zip (or cloned the repository).
+4. Drag and drop the ZIP to the Chrome Extensions tab.
 5. For the best experience, pin the extension to your taskbar.
 
 Steps 1, 2, 3, and 4.
@@ -34,7 +34,7 @@ NOTE: if you close the extension while the migrations is in progress the migrati
 
 # Known limitations:
     - No support for Interactive HTML & Facebook Carousel
-    - No Animations
+    - No Animations (videos will be transferred over with component clip set from 0 to scene duration)
     - No Feeds
     - No Auto-layout
     - No HTML fallback image

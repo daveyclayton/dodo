@@ -60,13 +60,12 @@ export async function fetchCreatives (designFileId) {
     }
 }
 
-export async function fetchDesignFileAccountId (designFileId) {
-    const errorMessage = `Failed to fetch the account of the Design file '${designFileId}'. Please check the ID and your permissions.`
+export async function fetchFalconDesignFile (designFileId) {
+    const errorMessage = `Failed to fetch the Falcon Design file '${designFileId}'. Please check the ID and your permissions.`
 
     try {
-        const response = await dispatch(`folders/${designFileId}?fields=accountId`)
-        const responseJson = await response.json()
-        return responseJson.accountId
+        const response = await dispatch(`folders/${designFileId}?fields=id,name,accountId`)
+        return await response.json()
     } catch {
         throw new Error(errorMessage)
     }
