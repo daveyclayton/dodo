@@ -4,6 +4,10 @@ export function getVariants (creative) {
     return creative.units.banner.variants ?? [creative.units.banner]
 }
 
+export function getVariantDurationInSeconds (variant) {
+    return variant.master.scenes[0].duration * 1000
+}
+
 export function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
     const fontTypefaceId = fonts.find(f => f.localId === fontLocalId)?.typefaceId
     const font = platformFonts.find(f => f.id === fontTypefaceId)

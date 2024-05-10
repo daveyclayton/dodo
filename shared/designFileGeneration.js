@@ -2,7 +2,7 @@
 import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
 import { generateId, getInt, convertPercentToPx } from "./utils.js"
-import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getXYFromFalconPosition } from "./falconUtils.js"
+import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getXYFromFalconPosition, getVariantDurationInSeconds } from "./falconUtils.js"
 import { generatePropertyObject } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
@@ -14,7 +14,7 @@ function generateOrderIndexes () {
     orderIndexes = generateNOrderIndexes([], 5000)
 }
 
-function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys = []) {
+function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
     const eagleComponent = {
         id: generateId(),
         name: falconComponent.name,
@@ -187,10 +187,21 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         } else {
             eagleComponent.attributes.video = generatePropertyObject(null, mediaLineItemCompoundKeys)
         }
+
+        // Video needs a component clip animation for valid schema
+        eagleComponent.animations.push({
+            id: generateId(),
+            type: "ComponentClip",
+            attributes: {
+                presence: generatePropertyObject(true, mediaLineItemCompoundKeys),
+                delay: generatePropertyObject(0, mediaLineItemCompoundKeys),
+                duration: generatePropertyObject(falconComponent.sceneDuration, mediaLineItemCompoundKeys),
+            },
+        })
         break
     case "Group":
         eagleComponent.type = "Group"
-        eagleComponent.attributes.fill = generatePropertyObject(falconComponent.backgroundColor, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fill = generatePropertyObject(falconComponent.background ? falconComponent.backgroundColor : null, mediaLineItemCompoundKeys)
         eagleComponent.attributes.overflow = generatePropertyObject("hidden")
         eagleComponent.attributes.layout = generatePropertyObject("manual")
         eagleComponent.attributes.spacing = generatePropertyObject(10)
@@ -207,7 +218,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     return eagleComponent
 }
 
-function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys = []) {
+function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
     const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
     const eagleComponents = [eagleComponent]
     if (falconComponent.clazz === "Group") {
@@ -223,6 +234,7 @@ function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, p
                     width: convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false),
                     height: convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false),
                 },
+                sceneDuration: falconComponent.sceneDuration,
                 parentId: eagleComponent.id,
             }
             eagleComponents.push(...getEagleComponentsFromFalconComponent(falconComponentWithParentInfo, files, fonts, platformFonts, mediaLineItemCompoundKeys))
@@ -333,7 +345,7 @@ function getFurniture (format, creative) {
 function getMediaLineItem (format, designUnitFormat, variant, creative) {
     const width = variant.layouts[0].designTimeSize.width
     const height = variant.layouts[0].designTimeSize.height
-    const duration = designUnitFormat === "image" ? null : variant.master.scenes[0].duration * 1000
+    const duration = designUnitFormat === "image" ? null : getVariantDurationInSeconds(variant)
     const name = `${format.split(".").join(" ")} ${width}x${height}`
     const designUnitFormatLowercase = designUnitFormat.toLowerCase()
     let mediaLineItemPath = designUnitFormatLowercase
@@ -457,6 +469,7 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
                         width: variant.layouts[0].designTimeSize.width,
                         height: variant.layouts[0].designTimeSize.height,
                     },
+                    sceneDuration: getVariantDurationInSeconds(variant),
                     mediaLineItemIndex,
                 })
             })
