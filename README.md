@@ -5,7 +5,6 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
 # TODO
-    - support transferring furniture
     - components of same name and clazz should be the same component in eagle
     - anchoring?
     - handling of choice components (once they are supported in eagle)
@@ -31,10 +30,13 @@ Step 5.
 4. Check the created Eagle Design File and adjust it to be pixel perfect. Please note the Known limitations of the migration extension listed below.
 5. If something does not work, you are encountering issues or would like to submit a suggestion (perhaps a missing feature not listed in Known limitations or something else), please post to `#birds-of-prey` slack channel.
 
+NOTE: if you close the extension while the migrations is in progress the migration will stop.
+
 # Known limitations:
     - No support for Interactive HTML & Facebook Carousel
     - No Animations
     - No Feeds
-    - No Highlight styles
-    - No letterSpacing
     - No Auto-layout
+    - No HTML fallback image
+    - No Highlight styles
+    - No letter spacing

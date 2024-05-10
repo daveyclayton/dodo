@@ -275,7 +275,8 @@ function getEagleFormatFromFalconClazz (clazz) {
     }
 }
 
-function getFurniture (format) {
+function getFurniture (format, creative) {
+    debugger
     switch (format) {
     case "image":
     case "video":
@@ -286,105 +287,42 @@ function getFurniture (format) {
         return {
             primaryText: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookMessage ?? "", [], null, "content"),
             },
             headline: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookImageHeadline ?? creative.units.banner.facebookVideoHeadline, [], null, "content"),
             },
             description: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookImageLinkDescription ?? creative.units.banner.facebookVideoLinkDescription, [], null, "content"),
             },
             callToAction: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookCallToAction ?? "", [], null, "content"),
             },
             websiteUrl: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookWebsiteUrl ?? "", [], null, "content"),
             },
             displayLink: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookDisplayLink ?? "", [], null, "content"),
             },
             deeplink: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.facebookDeeplink ?? "", [], null, "content"),
             },
         }
     case "youtube.video":
         return {
             title: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.youTubeTitle ?? "", [], null, "content"),
             },
             description: {
                 type: "Text",
-                text: {
-                    markedForScaling: false,
-                    values: {
-                        default: "",
-                    },
-                    dependsOn: "content",
-                    dimensions: [],
-                },
+                text: generatePropertyObject(creative.units.banner.youTubeDescription ?? "", [], null, "content"),
             },
         }
     default:
@@ -392,7 +330,11 @@ function getFurniture (format) {
     }
 }
 
-function getMediaLineItem (format, designUnitFormat, name, width, height, duration) {
+function getMediaLineItem (format, designUnitFormat, variant, creative) {
+    const width = variant.layouts[0].designTimeSize.width
+    const height = variant.layouts[0].designTimeSize.height
+    const duration = designUnitFormat === "image" ? null : variant.master.scenes[0].duration * 1000
+    const name = `${format.split(".").join(" ")} ${width}x${height}`
     const designUnitFormatLowercase = designUnitFormat.toLowerCase()
     let mediaLineItemPath = designUnitFormatLowercase
     const mediaLineItem = {
@@ -465,7 +407,7 @@ function getMediaLineItem (format, designUnitFormat, name, width, height, durati
         mediaLineItem.root.children[designUnitFormatLowercase] = designUnit
     }
 
-    const furniture = getFurniture(format)
+    const furniture = getFurniture(format, creative)
     if (furniture) {
         mediaLineItem.root.children = {
             ...furniture,
@@ -487,11 +429,7 @@ function getMediaLineItems (creatives) {
         const designUnitFormat = getEagleDesignUnitFormatFromFalconClazz(creative.clazz)
         const format = getEagleFormatFromFalconClazz(creative.clazz).toLowerCase()
         getVariants(creative).forEach(variant => {
-            const width = variant.layouts[0].designTimeSize.width
-            const height = variant.layouts[0].designTimeSize.height
-            const duration = designUnitFormat === "image" ? null : variant.master.scenes[0].duration * 1000
-            const name = `${creative.name} ${width}x${height}`
-            const { mediaLineItem, mediaLineItemPath } = getMediaLineItem(format, designUnitFormat, name, width, height, duration)
+            const { mediaLineItem, mediaLineItemPath } = getMediaLineItem(format, designUnitFormat, variant, creative)
             mediaLineItems.push(mediaLineItem)
             mediaLineItemCompoundKeys.push(`${mediaLineItem.id}/${mediaLineItemPath}`)
         })
