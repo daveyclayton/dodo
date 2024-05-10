@@ -4,7 +4,7 @@ import {
     fetchFonts,
     fetchFalconDesignFile,
 } from "../shared/celtraApi.js"
-import { generateZip, generateJson } from "../shared/designFileGeneration.js"
+import { generateZip } from "../shared/designFileGeneration.js"
 import { getSync } from "../shared/storage.js"
 import { getCredentials } from "../shared/utils.js"
 
@@ -76,12 +76,6 @@ async function migrate () {
         const creatives = await fetchCreatives(designFileId)
         const falconDesignFile = await fetchFalconDesignFile(designFileId)
         const platformFonts = await fetchFonts(falconDesignFile.accountId)
-
-        // const json = await generateJson(creatives, platformFonts)
-        // showDone(JSON.stringify({
-        //     designFileContent: json,
-        // }))
-
         const zip = await generateZip(creatives, platformFonts)
         const designFileName = `[MIGRATED] ${falconDesignFile.name}`
         const newDesignFileUrl = await createDesignFile(accountId, designFileName, zip)
