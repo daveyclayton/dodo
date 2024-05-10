@@ -2,8 +2,11 @@
 
 Falcon to Eagle Design File migration extension with quite some known limitations 😅
 
+![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
+
 ### TODO:
     - components of same name and clazz should be the same component in eagle
+    - support all major Falcon formats
     - anchoring?
     - handling of choice components (once they are supported in eagle)
 

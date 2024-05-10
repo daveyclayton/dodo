@@ -214,6 +214,8 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
                 name: file?.name,
                 blobHash: file?.blobHash,
             }, mediaLineItemCompoundKeys)
+        } else {
+            eagleComponent.attributes.image = generatePropertyObject(null, mediaLineItemCompoundKeys)
         }
         break
     case "VideoAsset":
@@ -232,6 +234,8 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
                 name: file?.name,
                 blobHash: file?.blobHash,
             }, mediaLineItemCompoundKeys)
+        } else {
+            eagleComponent.attributes.video = generatePropertyObject(null, mediaLineItemCompoundKeys)
         }
         break
     case "Group":
@@ -257,11 +261,13 @@ function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, p
     const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
     const eagleComponents = [eagleComponent]
     if (falconComponent.clazz === "Group") {
-        falconComponent.content.objects.forEach(object => {
+        const groupComponents = falconComponent.content.objects
+        groupComponents.sort((a, b) => b.zIndex - a.zIndex)
+        groupComponents.forEach(component => {
             // Add info about the parent
             const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
             const falconComponentWithParentInfo = {
-                ...object,
+                ...component,
                 mediaLineItemIndex: falconComponent.mediaLineItemIndex,
                 parentSize: {
                     width: convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false),
@@ -405,8 +411,6 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
         const eagleCanvasComponents = getEagleComponentsFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
         const eligibleComponents = eagleCanvasComponents.filter(c => !!c)
         canvasComponents.push(...eligibleComponents)
-        console.log(eligibleComponents)
-        console.log(canvasComponents)
     })
 
     // const falconComponentsByNameAndClazz = {}

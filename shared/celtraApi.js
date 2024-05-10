@@ -1,4 +1,3 @@
-import { getSync } from "./storage.js"
 import { getCredentials } from "./utils.js"
 
 const PLATFORM_DOMAIN = "celtra.io"
@@ -56,6 +55,18 @@ export async function fetchCreatives (designFileId) {
         }
 
         return responseJson
+    } catch {
+        throw new Error(errorMessage)
+    }
+}
+
+export async function fetchDesignFileAccountId (designFileId) {
+    const errorMessage = `Failed to fetch the account of the Design file '${designFileId}'. Please check the ID and your permissions.`
+
+    try {
+        const response = await dispatch(`folders/${designFileId}?fields=accountId`)
+        const responseJson = await response.json()
+        return responseJson.accountId
     } catch {
         throw new Error(errorMessage)
     }

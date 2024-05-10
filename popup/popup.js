@@ -2,6 +2,7 @@ import {
     fetchCreatives,
     createDesignFile,
     fetchFonts,
+    fetchDesignFileAccountId,
 } from "../shared/celtraApi.js"
 import { generateZip, generateJson } from "../shared/designFileGeneration.js"
 import { getCredentials } from "../shared/utils.js"
@@ -62,7 +63,8 @@ async function migrate () {
 
     try {
         const creatives = await fetchCreatives(designFileId)
-        const platformFonts = await fetchFonts(accountId)
+        const sourceAccountId = await fetchDesignFileAccountId(designFileId)
+        const platformFonts = await fetchFonts(sourceAccountId)
 
         // const json = await generateJson(creatives, platformFonts)
         // showDone(JSON.stringify({
