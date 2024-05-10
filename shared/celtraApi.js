@@ -113,7 +113,7 @@ export async function fetchBlob (blobhash) {
 }
 
 export async function createDesignFile (accountId, name, zip) {
-    const errorMessage = "Failed to create the Design file. Please check your permissions. There might also be an issue with the migration script, please report this to #birds-of-prey."
+    const errorMessage = "Failed to create the Design file. Please check your permissions. There might also be an issue with the extension. Please report this with the Falcon Design File ID to #birds-of-prey."
     // accountId = "gdrkmcjinemf" // FOR TESTING
 
     try {

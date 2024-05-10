@@ -526,26 +526,36 @@ export async function generateZip (creatives, platformFonts) {
     const zip = new JSZip()
     zip.file("designFile.json", JSON.stringify(json))
 
+    const filePromises = []
     const fetchedFileBlobHashes = []
     for (const file of files) {
         if (fetchedFileBlobHashes.includes(file.blobHash)) {
             continue
         }
-        const blob = await fetchBlob(file.blobHash)
-        zip.file(`blobs/${file.blobHash}`, blob.blob())
+        filePromises.push(fetchBlob(file.blobHash))
         fetchedFileBlobHashes.push(file.blobHash)
     }
+    const fetchedFiles = await Promise.all(filePromises)
+    fetchedFiles.forEach(response => {
+        const blobHash = response.url.split("/").pop()
+        zip.file(`blobs/${blobHash}`, response.blob())
+    })
 
+    const fontPromises = []
     const fetchedFontBlobHashes = []
     for (const font of fonts) {
         const fontBlobHash = getPlatformFontBlobHash(font.localId, fonts, platformFonts)
         if (fetchedFontBlobHashes.includes(fontBlobHash)) {
             continue
         }
-        const blob = await fetchBlob(fontBlobHash)
-        zip.file(`fonts/${fontBlobHash}`, blob.blob())
+        fontPromises.push(fetchBlob(fontBlobHash))
         fetchedFontBlobHashes.push(fontBlobHash)
     }
+    const fetchedFonts = await Promise.all(fontPromises)
+    fetchedFonts.forEach(response => {
+        const blobHash = response.url.split("/").pop()
+        zip.file(`fonts/${blobHash}`, response.blob())
+    })
 
     return await zip.generateAsync({ type: "arraybuffer" })
 }
