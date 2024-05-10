@@ -11,7 +11,7 @@ Falcon to Eagle Design File migration extension with quite some known limitation
     - handling of choice components (once they are supported in eagle)
 
 # Installation
-The extension is not (yet) published on Chrome Web Store. You can clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) or download the ZIP & unpack it locally (studio) and manually install the extension by:
+The extension is not (yet) published on Chrome Web Store. You can clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) or download the ZIP & unpack it locally (studio) and manually install the extension by following these steps:
 1. Open Google Chrome browser.
 2. Navigate to `chrome://extensions`
 3. Make sure that Developer mode is turned on.
