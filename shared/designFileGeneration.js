@@ -9,7 +9,7 @@ let orderIndexIndex = 0
 let orderIndexes = []
 
 function generateOrderIndexes () {
-    orderIndexes = generateNOrderIndexes([], 10000)
+    orderIndexes = generateNOrderIndexes([], 5000)
 }
 
 function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
@@ -74,7 +74,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             skewX: generatePropertyObject(0),
             skewY: generatePropertyObject(0),
             blending: generatePropertyObject("normal"),
-            presence: generatePropertyObject(true, mediaLineItemCompoundKeys, false),
+            presence: generatePropertyObject(true, [mediaLineItemCompoundKeys[falconComponent.mediaLineItemIndex]], false), // TODO: change when we will be grouping components by name
             hidden: generatePropertyObject(false),
             locked: generatePropertyObject(false),
             resizingWidth: generatePropertyObject("fixed"),
@@ -262,6 +262,7 @@ function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, p
             const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
             const falconComponentWithParentInfo = {
                 ...object,
+                mediaLineItemIndex: falconComponent.mediaLineItemIndex,
                 parentSize: {
                     width: convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false),
                     height: convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false),
@@ -390,6 +391,7 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
                         width: variant.layouts[0].designTimeSize.width,
                         height: variant.layouts[0].designTimeSize.height,
                     },
+                    mediaLineItemIndex,
                 })
             })
             creativeComponents.sort((a, b) => b.zIndex - a.zIndex)

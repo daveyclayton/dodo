@@ -3,8 +3,7 @@
 Falcon to Eagle Design File migration extension with quite some known limitations 😅
 
 ### TODO:
-    - presence of components
-    - handling of groups
+    - components of same name and clazz should be the same component in eagle
     - anchoring?
     - handling of choice components (once they are supported in eagle)
 
