@@ -8,13 +8,16 @@ import { generateZip } from "../shared/designFileGeneration.js"
 import { getSync } from "../shared/storage.js"
 import { getCredentials } from "../shared/utils.js"
 
+const designFileInput = document.getElementById("design-file-id")
+const accountInput = document.getElementById("account-id")
+
 function loadDefaults () {
     getSync("defaults").then(defaults => {
         if (!defaults) {
             return
         }
-        document.getElementById("design-file-id").value = defaults.designFileId
-        document.getElementById("account-id").value = defaults.accountId
+        designFileInput.value = defaults.designFileId
+        accountInput.value = defaults.accountId
     })
 }
 
@@ -28,7 +31,7 @@ async function showEnterData () {
     toggleElement("done", false)
     toggleElement("error", false)
     toggleElement("enter-data", true)
-    document.getElementById("design-file-id").focus()
+    designFileInput.focus()
 }
 
 function showLoading () {
@@ -59,8 +62,8 @@ function showDone (destinationUrl) {
 }
 
 async function migrate () {
-    const designFileId = document.getElementById("design-file-id").value
-    const accountId = document.getElementById("account-id").value
+    const designFileId = designFileInput.value
+    const accountId = accountInput.value
 
     const isIdValid = (id) => {
         return id && typeof id === "string" && (id.length === 8 || id.length === 12)
@@ -86,12 +89,16 @@ async function migrate () {
     }
 }
 
+function onKeyDown (event) {
+    if (event.key === "Enter") {
+        migrate()
+    }
+}
+
 getCredentials()
 loadDefaults()
 showEnterData()
-document.getElementById("design-file-id").addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-        migrate()
-    }
-})
+
+designFileInput.addEventListener("keypress", onKeyDown)
+accountInput.addEventListener("keypress", onKeyDown)
 document.getElementById("submit").addEventListener("click", migrate)
