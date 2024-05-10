@@ -249,7 +249,8 @@ function getEagleDesignUnitFormatFromFalconClazz (clazz) {
     case "ExportableFastLoadingAnimatedBanner":
         return "HTML"
     default:
-        throw new Error(`Unsupported creative format: '${clazz}'.`)
+        console.error(`Unsupported creative format: '${clazz}'.`)
+        return null
     }
 }
 
@@ -271,7 +272,8 @@ function getEagleFormatFromFalconClazz (clazz) {
     case "ExportableFastLoadingAnimatedBanner":
         return "HTML"
     default:
-        throw new Error(`Unsupported creative format: '${clazz}'.`)
+        console.error(`Unsupported creative format: '${clazz}'.`)
+        return null
     }
 }
 
@@ -325,7 +327,8 @@ function getFurniture (format, creative) {
             },
         }
     default:
-        throw new Error(`Unsupported creative format: '${format}'.`)
+        console.error(`Unsupported creative format: '${format}'.`)
+        return {}
     }
 }
 
@@ -427,6 +430,9 @@ function getMediaLineItems (creatives) {
     creatives.forEach(creative => {
         const designUnitFormat = getEagleDesignUnitFormatFromFalconClazz(creative.clazz)
         const format = getEagleFormatFromFalconClazz(creative.clazz).toLowerCase()
+        if (!designUnitFormat || !format) {
+            return
+        }
         getVariants(creative).forEach(variant => {
             const { mediaLineItem, mediaLineItemPath } = getMediaLineItem(format, designUnitFormat, variant, creative)
             mediaLineItems.push(mediaLineItem)
