@@ -5,7 +5,18 @@ import {
     fetchDesignFileAccountId,
 } from "../shared/celtraApi.js"
 import { generateZip, generateJson } from "../shared/designFileGeneration.js"
+import { getSync } from "../shared/storage.js"
 import { getCredentials } from "../shared/utils.js"
+
+function loadDefaults () {
+    getSync("defaults").then(defaults => {
+        if (!defaults) {
+            return
+        }
+        document.getElementById("design-file-id").value = defaults.designFileId
+        document.getElementById("account-id").value = defaults.accountId
+    })
+}
 
 function toggleElement (elementId, visible) {
     const display = visible ? "block" : "none"
@@ -82,6 +93,7 @@ async function migrate () {
 }
 
 getCredentials()
+loadDefaults()
 showEnterData()
 document.getElementById("design-file-id").addEventListener("keypress", function (e) {
     if (e.key === "Enter") {

@@ -1,13 +1,13 @@
 @import "../shared/common.css";
 
 .options__label {
-    width: 350px;
+    width: 370px;
     display: flex;
     margin: auto;
 }
 
 .options__label-text {
-    width: 110px;
+    width: 130px;
     line-height: 22px;
 }
 

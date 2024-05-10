@@ -18,11 +18,30 @@
                 <input class="options__input" type="text" placeholder="Please enter your CA API App secret" id="api-app-secret" />
             </label>
             <br/>
-            <div class="button" id="save">Save</div>
+            <div class="button" id="save-credentials">Save</div>
             <br/>
-            <div id="status"></div>
+            <div id="credentials-status"></div>
             <br/>
             <br/>
+            <br/>
+            <br/>
+            <div class="heading">Default extension settings.</div>
+            <div>Those ids will always pre-populate when opening an extension. Useful for development.
+            <br/>
+            <br/>
+            <label class="options__label">
+                <div class="options__label-text">Default Design File ID</div>
+                <input class="options__input" type="text" placeholder="Please the Design File ID to be prepopulated" id="default-design-file-id" />
+            </label>
+            <br/>
+            <label class="options__label">
+                <div class="options__label-text">Default Account ID</div>
+                <input class="options__input" type="text" placeholder="Please the Account ID to be prepopulated" id="default-account-id" />
+            </label>
+            <br/>
+            <div class="button" id="save-defaults">Save</div>
+            <br/>
+            <div id="defaults-status"></div>
         </div>
         <script type="module" src="options.js"></script>
     </body>

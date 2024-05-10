@@ -2,7 +2,7 @@
 import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
 import { generateId, getInt, convertPercentToPx } from "./utils.js"
-import { getVariants, getPlatformFontBlobHash, getFiles, getFonts } from "./falconUtils.js"
+import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getXYFromFalconPosition } from "./falconUtils.js"
 import { generatePropertyObject } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
@@ -38,9 +38,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     }
 
     const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
-
-    const x = convertPercentToPx(layoutSpecificValue.position.left, falconComponent.parentSize.width)
-    const y = convertPercentToPx(layoutSpecificValue.position.top, falconComponent.parentSize.height)
+    const { x, y } = getXYFromFalconPosition(layoutSpecificValue.position, falconComponent.parentSize)
     const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false)
     const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false)
 
