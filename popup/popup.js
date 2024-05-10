@@ -60,16 +60,19 @@ function showDone (destinationUrl) {
 
 async function migrate () {
     const designFileId = document.getElementById("design-file-id").value
-    if (!designFileId || typeof designFileId !== "string" || designFileId.length !== 8 && designFileId.length !== 12) {
-        showError("Design file ID is required and has to be 8 or 12 characters long.")
-        return
-    }
     const accountId = document.getElementById("account-id").value
-    if (!accountId || typeof accountId !== "string" || accountId.length !== 8 && accountId.length !== 12) {
-        showError("Account ID is required and has to be 8 or 12 characters long.")
-        return
+
+    const validateId = (id, entityName) => {
+        if (!id || typeof id !== "string" || id.length !== 8 && id.length !== 12) {
+            showError(`${entityName} ID is required and has to be 8 or 12 characters long.`)
+            return false
+        }
+        return true
     }
 
+    if (!validateId(designFileId, "Design file") || !validateId(accountId, "Account")) {
+        return
+    }
     showLoading()
 
     try {
