@@ -7,11 +7,26 @@ import { generatePropertyObject } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
 const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group"]
+const SUPPORTED_FORMATS = [
+    "ExportableImage",
+    "ExportableVideo",
+    "ExportableFastLoadingAnimatedBanner",
+    "FacebookPhotoAdPost",
+    "FacebookVideoAdPost",
+    "PinterestStaticPin",
+    "PinterestStandardWidthVideoPin",
+    "YouTubeBumperAds",
+    "YouTubeTrueView",
+]
 let orderIndexIndex = 0
 let orderIndexes = []
 
 function generateOrderIndexes () {
     orderIndexes = generateNOrderIndexes([], 5000)
+}
+
+function getEligibleCreatives (creatives) {
+    return creatives.filter(creative => SUPPORTED_FORMATS.includes(creative.clazz))
 }
 
 function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
@@ -94,7 +109,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             highlightTopPadding: generatePropertyObject(0),
             highlightBottomPadding: generatePropertyObject(0),
             highlightBorderRadius: generatePropertyObject(0),
-            appleFontTracking: generatePropertyObject(falconComponent.useAppleFontTrackingValue, mediaLineItemCompoundKeys),
+            appleFontTracking: generatePropertyObject(falconComponent.useAppleFontTrackingValue ?? false, mediaLineItemCompoundKeys),
             fontBlobHash: generatePropertyObject(platformFontBlobHash),
         }
 
@@ -440,9 +455,6 @@ function getMediaLineItems (creatives) {
     creatives.forEach(creative => {
         const designUnitFormat = getEagleDesignUnitFormatFromFalconClazz(creative.clazz)
         const format = getEagleFormatFromFalconClazz(creative.clazz).toLowerCase()
-        if (!designUnitFormat || !format) {
-            return
-        }
         getVariants(creative).forEach(variant => {
             const { mediaLineItem, mediaLineItemPath } = getMediaLineItem(format, designUnitFormat, variant, creative)
             mediaLineItems.push(mediaLineItem)
@@ -498,10 +510,8 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
     return canvasComponents
 }
 
-export async function generateJson (creatives, platformFonts) {
+export async function generateJson (creatives, fonts, files, platformFonts) {
     generateOrderIndexes()
-    const files = getFiles(creatives)
-    const fonts = getFonts(creatives)
     const { mediaLineItems, mediaLineItemCompoundKeys } = getMediaLineItems(creatives)
     const canvasComponents = getCanvasComponents(creatives, files, fonts, platformFonts, mediaLineItemCompoundKeys)
     return {
@@ -533,9 +543,18 @@ export async function generateJson (creatives, platformFonts) {
 }
 
 export async function generateZip (creatives, platformFonts) {
-    const json = await generateJson(creatives, platformFonts)
-    const files = getFiles(creatives)
-    const fonts = getFonts(creatives)
+    const warnings = []
+    const eligibleCreatives = getEligibleCreatives(creatives)
+    if (eligibleCreatives.length === 0) {
+        throw new Error("No eligible creatives found.")
+    }
+    if (eligibleCreatives.length !== creatives.length) {
+        warnings.push("Some creatives are of unsupported formats and were skipped during migration.")
+    }
+
+    const files = getFiles(eligibleCreatives)
+    const fonts = getFonts(eligibleCreatives)
+    const json = await generateJson(eligibleCreatives, fonts, files, platformFonts)
     const zip = new JSZip()
     zip.file("designFile.json", JSON.stringify(json))
 
@@ -570,7 +589,11 @@ export async function generateZip (creatives, platformFonts) {
         zip.file(`fonts/${blobHash}`, response.blob())
     })
 
-    return await zip.generateAsync({ type: "arraybuffer" })
+    const zipBlob = await zip.generateAsync({ type: "arraybuffer" })
+    return {
+        zip: zipBlob,
+        warnings,
+    }
 }
 
 /* !

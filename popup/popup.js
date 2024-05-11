@@ -51,11 +51,16 @@ function showError (errorMessage) {
     errorContentElement.textContent = errorMessage
 }
 
-function showDone (destinationUrl) {
+function showDone (destinationUrl, warnings) {
     toggleElement("loading", false)
     toggleElement("enter-data", false)
     toggleElement("error", false)
     toggleElement("done", true)
+
+    if (warnings) {
+        const warningsElement = document.getElementById("warnings")
+        warningsElement.textContent = warnings.join("\n")
+    }
 
     const destinationContentElement = document.getElementById("destination-url")
     destinationContentElement.href = destinationUrl
@@ -79,10 +84,10 @@ async function migrate () {
         const creatives = await fetchCreatives(designFileId)
         const falconDesignFile = await fetchFalconDesignFile(designFileId)
         const platformFonts = await fetchFonts(falconDesignFile.accountId)
-        const zip = await generateZip(creatives, platformFonts)
+        const { zip, warnings } = await generateZip(creatives, platformFonts)
         const designFileName = `[MIGRATED] ${falconDesignFile.name}`
         const newDesignFileUrl = await createDesignFile(accountId, designFileName, zip)
-        showDone(newDesignFileUrl)
+        showDone(newDesignFileUrl, warnings)
     } catch (error) {
         console.log(error)
         showError(error)
