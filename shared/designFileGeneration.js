@@ -302,11 +302,11 @@ function getFurniture (format, creative) {
             },
             headline: {
                 type: "Text",
-                text: generatePropertyObject(creative.units.banner.facebookImageHeadline ?? creative.units.banner.facebookVideoHeadline, [], null, "content"),
+                text: generatePropertyObject(creative.units.banner.facebookImageHeadline ?? creative.units.banner.facebookVideoHeadline ?? "", [], null, "content"),
             },
             description: {
                 type: "Text",
-                text: generatePropertyObject(creative.units.banner.facebookImageLinkDescription ?? creative.units.banner.facebookVideoLinkDescription, [], null, "content"),
+                text: generatePropertyObject(creative.units.banner.facebookImageLinkDescription ?? creative.units.banner.facebookVideoLinkDescription ?? "", [], null, "content"),
             },
             callToAction: {
                 type: "Text",
