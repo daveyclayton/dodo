@@ -21,12 +21,16 @@ export function getInt (falconNumberString) {
     return parseInt(falconNumberString.replace("px", ""))
 }
 
-export function convertPercentToPx (numberString, parentSizeInPx, allowFloat = true) {
+export function convertPercentToPx (numberOrString, parentSizeInPx, allowFloat = true) {
+    if (typeof numberOrString === "number") {
+        return numberOrString
+    }
+
     let number = null
-    if (numberString.endsWith("%")) {
-        number = numberString.replace("%", "") / 100 * parentSizeInPx
+    if (numberOrString.endsWith("%")) {
+        number = numberOrString.replace("%", "") / 100 * parentSizeInPx
     } else {
-        number = getFloat(numberString)
+        number = getFloat(numberOrString)
     }
 
     if (allowFloat) {
