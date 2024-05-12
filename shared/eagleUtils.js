@@ -18,6 +18,34 @@ export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], d
     return propertyObject
 }
 
+export function getEagleTextAlign (falconTextAlign) {
+    switch (falconTextAlign) {
+    case "left":
+    case "start":
+        return "left"
+    case "center":
+        return "center"
+    case "right":
+    case "end":
+        return "right"
+    default:
+        return "left"
+    }
+}
+
+export function getEagleVerticalTextAlign (falconVerticalTextAlign) {
+    switch (falconVerticalTextAlign) {
+    case 0:
+    case "0":
+        return "top"
+    case 100:
+    case "100":
+        return "bottom"
+    default:
+        return "middle"
+    }
+}
+
 export function convertColor (sourceColor) {
     if (sourceColor.startsWith("linear-gradient")) {
         return convertLinearGradient(sourceColor)

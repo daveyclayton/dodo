@@ -3,7 +3,7 @@ import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
 import { generateId, getInt, convertPercentToPx } from "./utils.js"
 import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getXYFromFalconPosition, getVariantDurationInSeconds } from "./falconUtils.js"
-import { convertColor, generatePropertyObject } from "./eagleUtils.js"
+import { convertColor, generatePropertyObject, getEagleTextAlign, getEagleVerticalTextAlign } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
 const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group"]
@@ -53,9 +53,9 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     }
 
     const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
-    const { x, y } = getXYFromFalconPosition(layoutSpecificValue.position, falconComponent.parentSize)
     const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false)
     const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false)
+    const { x, y } = getXYFromFalconPosition(layoutSpecificValue.position, { width, height }, falconComponent.parentSize)
 
     eagleComponent.attributes.x = generatePropertyObject(x, mediaLineItemCompoundKeys)
     eagleComponent.attributes.y = generatePropertyObject(y, mediaLineItemCompoundKeys)
@@ -122,8 +122,8 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.resizingWidth = generatePropertyObject("hugContent")
         eagleComponent.attributes.resizingHeight = generatePropertyObject("hugContent")
         eagleComponent.attributes.textDirection = generatePropertyObject("auto")
-        eagleComponent.attributes.horizontalAlignment = generatePropertyObject("left")
-        eagleComponent.attributes.verticalAlignment = generatePropertyObject("top")
+        eagleComponent.attributes.horizontalAlignment = generatePropertyObject(getEagleTextAlign(falconComponent.textAlign), mediaLineItemCompoundKeys)
+        eagleComponent.attributes.verticalAlignment = generatePropertyObject(getEagleVerticalTextAlign(falconComponent.textAlignVertical), mediaLineItemCompoundKeys)
         eagleComponent.attributes.content = generatePropertyObject([
             {
                 type: "text",

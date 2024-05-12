@@ -46,7 +46,7 @@ export function getFonts (creatives) {
     return fonts
 }
 
-export function getXYFromFalconPosition (position, parentSize) {
+export function getXYFromFalconPosition (position, size, parentSize) {
     let left, top
     if (position.hcenter) {
         let hcenterPx = position.hcenter
@@ -55,7 +55,7 @@ export function getXYFromFalconPosition (position, parentSize) {
         }
         left = `${parentSize.width / 2 + getFloat(hcenterPx)}px`
     } else {
-        left = position.left ?? parentSize.width - getFloat(position.right)
+        left = position.left ?? parentSize.width - getFloat(position.right) - getFloat(size.width)
     }
 
     if (position.vcenter) {
@@ -65,7 +65,7 @@ export function getXYFromFalconPosition (position, parentSize) {
         }
         top = `${parentSize.height / 2 + getFloat(vcenterPx)}px`
     } else {
-        top = position.top ?? parentSize.height - getFloat(position.bottom)
+        top = position.top ?? parentSize.height - getFloat(position.bottom) - getFloat(size.height)
     }
 
     return {
