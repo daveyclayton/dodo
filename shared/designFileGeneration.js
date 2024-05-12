@@ -2,8 +2,15 @@
 import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
 import { generateId, getInt, convertPercentToPx } from "./utils.js"
-import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getXYFromFalconPosition, getVariantDurationInSeconds } from "./falconUtils.js"
-import { convertColor, generatePropertyObject, getEagleTextAlign, getEagleVerticalTextAlign } from "./eagleUtils.js"
+import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getVariantDurationInSeconds } from "./falconUtils.js"
+import {
+    getXYFromFalconPosition,
+    getEagleColor,
+    generatePropertyObject,
+    getEagleTextAlign,
+    getEagleTextDecoration,
+    getEagleVerticalTextAlign,
+} from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
 const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group"]
@@ -67,7 +74,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     if (falconComponent.shadow) {
         eagleComponent.attributes.shadowX = generatePropertyObject(falconComponent.shadowDistance, mediaLineItemCompoundKeys)
         eagleComponent.attributes.shadowY = generatePropertyObject(falconComponent.shadowDistance, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowColor = generatePropertyObject(convertColor(falconComponent.shadowColor), mediaLineItemCompoundKeys)
+        eagleComponent.attributes.shadowColor = generatePropertyObject(getEagleColor(falconComponent.shadowColor), mediaLineItemCompoundKeys)
         eagleComponent.attributes.shadowBlur = generatePropertyObject(falconComponent.shadowBlur, mediaLineItemCompoundKeys)
     } else {
         // Weird eagle default values
@@ -82,7 +89,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.strokePosition = generatePropertyObject("inside")
         if (falconComponent.border) {
             eagleComponent.attributes.strokeWidth = generatePropertyObject(falconComponent.borderWidth, mediaLineItemCompoundKeys)
-            eagleComponent.attributes.strokeFill = generatePropertyObject(convertColor(falconComponent.borderColor), mediaLineItemCompoundKeys)
+            eagleComponent.attributes.strokeFill = generatePropertyObject(getEagleColor(falconComponent.borderColor), mediaLineItemCompoundKeys)
         } else {
             eagleComponent.attributes.strokeWidth = generatePropertyObject(null, mediaLineItemCompoundKeys)
             eagleComponent.attributes.strokeFill = generatePropertyObject(null, mediaLineItemCompoundKeys)
@@ -97,10 +104,10 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             fontSize: generatePropertyObject(getInt(falconComponent.fontSize), mediaLineItemCompoundKeys),
             letterSpacing: generatePropertyObject({ value: 0, unit: "%" }, mediaLineItemCompoundKeys),
             lineHeight: generatePropertyObject({ value: 100, unit: "%" } ),
-            decoration: generatePropertyObject(null),
+            decoration: generatePropertyObject(getEagleTextDecoration(falconComponent.textDecoration), mediaLineItemCompoundKeys),
             transform: generatePropertyObject(null),
-            fill: generatePropertyObject(convertColor(falconComponent.textColor), mediaLineItemCompoundKeys),
-            strokeFill: generatePropertyObject(falconComponent.textStroke ? convertColor(falconComponent.textStrokeColor) : null, mediaLineItemCompoundKeys),
+            fill: generatePropertyObject(getEagleColor(falconComponent.textColor), mediaLineItemCompoundKeys),
+            strokeFill: generatePropertyObject(falconComponent.textStroke ? getEagleColor(falconComponent.textStrokeColor) : null, mediaLineItemCompoundKeys),
             strokeWidth: generatePropertyObject(falconComponent.textStroke ? falconComponent.textStrokeSize : null, mediaLineItemCompoundKeys),
             strokePosition: generatePropertyObject("inside", mediaLineItemCompoundKeys),
             highlightFill: generatePropertyObject(null),
@@ -148,7 +155,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         break
     case "Shapey":
         eagleComponent.type = "Rectangle"
-        eagleComponent.attributes.fill = generatePropertyObject(convertColor(falconComponent.backgroundColor), mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fill = generatePropertyObject(getEagleColor(falconComponent.backgroundColor), mediaLineItemCompoundKeys)
         break
     case "Picture":
         eagleComponent.type = "Picture"
@@ -216,7 +223,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         break
     case "Group":
         eagleComponent.type = "Group"
-        eagleComponent.attributes.fill = generatePropertyObject(falconComponent.background ? convertColor(falconComponent.backgroundColor) : null, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fill = generatePropertyObject(falconComponent.background ? getEagleColor(falconComponent.backgroundColor) : null, mediaLineItemCompoundKeys)
         eagleComponent.attributes.overflow = generatePropertyObject("hidden")
         eagleComponent.attributes.layout = generatePropertyObject("manual")
         eagleComponent.attributes.spacing = generatePropertyObject(10)

@@ -1,3 +1,5 @@
+import { getFloat, convertPercentToPx } from "./utils.js"
+
 export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null, dependsOn = "canvas") {
     const propertyObject = {
         markedForScaling: false,
@@ -16,6 +18,45 @@ export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], d
     })
 
     return propertyObject
+}
+
+export function getXYFromFalconPosition (position, size, parentSize) {
+    let left, top
+    if (position.hcenter) {
+        let hcenterPx = position.hcenter
+        if (hcenterPx.endsWith("%")) {
+            hcenterPx = convertPercentToPx(hcenterPx, parentSize.width)
+        }
+        left = `${parentSize.width / 2 + getFloat(hcenterPx)}px`
+    } else {
+        left = position.left ?? parentSize.width - getFloat(position.right) - getFloat(size.width)
+    }
+
+    if (position.vcenter) {
+        let vcenterPx = position.vcenter
+        if (vcenterPx.endsWith("%")) {
+            vcenterPx = convertPercentToPx(vcenterPx, parentSize.height)
+        }
+        top = `${parentSize.height / 2 + getFloat(vcenterPx)}px`
+    } else {
+        top = position.top ?? parentSize.height - getFloat(position.bottom) - getFloat(size.height)
+    }
+
+    return {
+        x: convertPercentToPx(left, parentSize.width),
+        y: convertPercentToPx(top, parentSize.height),
+    }
+}
+
+export function getEagleTextDecoration (falconTextDecoration) {
+    switch (falconTextDecoration) {
+    case "underline":
+        return "underline"
+    case "line-through":
+        return "strikethrough"
+    default:
+        return null
+    }
 }
 
 export function getEagleTextAlign (falconTextAlign) {
@@ -46,7 +87,7 @@ export function getEagleVerticalTextAlign (falconVerticalTextAlign) {
     }
 }
 
-export function convertColor (sourceColor) {
+export function getEagleColor (sourceColor) {
     if (sourceColor.startsWith("linear-gradient")) {
         return convertLinearGradient(sourceColor)
     }

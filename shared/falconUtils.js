@@ -1,5 +1,3 @@
-import { getFloat, convertPercentToPx } from "./utils.js"
-
 export function getVariants (creative) {
     return creative.units.banner.variants ?? [creative.units.banner]
 }
@@ -44,32 +42,4 @@ export function getFonts (creatives) {
     })
 
     return fonts
-}
-
-export function getXYFromFalconPosition (position, size, parentSize) {
-    let left, top
-    if (position.hcenter) {
-        let hcenterPx = position.hcenter
-        if (hcenterPx.endsWith("%")) {
-            hcenterPx = convertPercentToPx(hcenterPx, parentSize.width)
-        }
-        left = `${parentSize.width / 2 + getFloat(hcenterPx)}px`
-    } else {
-        left = position.left ?? parentSize.width - getFloat(position.right) - getFloat(size.width)
-    }
-
-    if (position.vcenter) {
-        let vcenterPx = position.vcenter
-        if (vcenterPx.endsWith("%")) {
-            vcenterPx = convertPercentToPx(vcenterPx, parentSize.height)
-        }
-        top = `${parentSize.height / 2 + getFloat(vcenterPx)}px`
-    } else {
-        top = position.top ?? parentSize.height - getFloat(position.bottom) - getFloat(size.height)
-    }
-
-    return {
-        x: convertPercentToPx(left, parentSize.width),
-        y: convertPercentToPx(top, parentSize.height),
-    }
 }
