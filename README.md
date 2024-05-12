@@ -7,8 +7,8 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 # TODO
     - test hcenter/vcenter with % values
     - components of the same name and clazz should be the same component in eagle
-    - anchoring?
     - handling of choice components (once they are supported in Eagle)
+    - anchoring?
 
 # Installation
 The extension is not (yet) published on the Chrome Web Store. You can clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) or download the ZIP (studio) and manually install the extension by following these steps:
