@@ -27,7 +27,8 @@ export function getXYFromFalconPosition (position, size, parentSize) {
         if (hcenterPx.endsWith("%")) {
             hcenterPx = convertPercentToPx(hcenterPx, parentSize.width)
         }
-        left = `${parentSize.width / 2 + getFloat(hcenterPx)}px`
+        const halfSelfWidth = getFloat(size.width) / 2
+        left = `${parentSize.width / 2 + getFloat(hcenterPx) - halfSelfWidth}px`
     } else {
         left = position.left ?? parentSize.width - getFloat(position.right) - getFloat(size.width)
     }
@@ -37,7 +38,8 @@ export function getXYFromFalconPosition (position, size, parentSize) {
         if (vcenterPx.endsWith("%")) {
             vcenterPx = convertPercentToPx(vcenterPx, parentSize.height)
         }
-        top = `${parentSize.height / 2 + getFloat(vcenterPx)}px`
+        const halfSelfHeight = getFloat(size.height) / 2
+        top = `${parentSize.height / 2 + getFloat(vcenterPx) - halfSelfHeight}px`
     } else {
         top = position.top ?? parentSize.height - getFloat(position.bottom) - getFloat(size.height)
     }
