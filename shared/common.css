@@ -1,7 +1,6 @@
 :root {
     --blue: #1966FF;
     --pink: #EC5EA5;
-    --red: #FF0033;
 }
 
 a {
@@ -18,14 +17,14 @@ a:hover {
 
 .heading {
     margin: 16px auto;
-    color: var(--pink);
+    color: var(--blue);
     font-weight: bold;
     font-size: 16px;
 }
 
 .warning {
     margin: 16px auto;
-    color: var(--red);
+    color: var(--pink);
     font-weight: bold;
     font-size: 14px;
 }
