@@ -10,6 +10,8 @@ import {
     getEagleTextAlign,
     getEagleTextDecoration,
     getEagleVerticalTextAlign,
+    getEagleDesignUnitFormatFromFalconClazz,
+    getEagleFormatFromFalconClazz,
 } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
@@ -264,49 +266,6 @@ function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, p
     }
 
     return eagleComponents
-}
-
-function getEagleDesignUnitFormatFromFalconClazz (clazz) {
-    switch (clazz) {
-    case "ExportableImage":
-    case "FacebookPhotoAdPost":
-    case "PinterestStaticPin":
-        return "Image"
-    case "ExportableVideo":
-    case "FacebookVideoAdPost":
-    case "PinterestStandardWidthVideoPin":
-    case "YouTubeBumperAds":
-    case "YouTubeTrueView":
-        return "Video"
-    case "ExportableFastLoadingAnimatedBanner":
-        return "HTML"
-    default:
-        console.error(`Unsupported creative format: '${clazz}'.`)
-        return null
-    }
-}
-
-function getEagleFormatFromFalconClazz (clazz) {
-    switch (clazz) {
-    case "ExportableImage":
-    case "PinterestStaticPin":
-        return "Image"
-    case "FacebookPhotoAdPost":
-        return "meta.image"
-    case "ExportableVideo":
-    case "PinterestStandardWidthVideoPin":
-        return "Video"
-    case "FacebookVideoAdPost":
-        return "meta.video"
-    case "YouTubeBumperAds":
-    case "YouTubeTrueView":
-        return "youtube.video"
-    case "ExportableFastLoadingAnimatedBanner":
-        return "HTML"
-    default:
-        console.error(`Unsupported creative format: '${clazz}'.`)
-        return null
-    }
 }
 
 function getFurniture (format, creative) {

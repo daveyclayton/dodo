@@ -48,6 +48,49 @@ export function getXYFromFalconPosition (position, size, parentSize) {
     }
 }
 
+export function getEagleDesignUnitFormatFromFalconClazz (clazz) {
+    switch (clazz) {
+    case "ExportableImage":
+    case "FacebookPhotoAdPost":
+    case "PinterestStaticPin":
+        return "Image"
+    case "ExportableVideo":
+    case "FacebookVideoAdPost":
+    case "PinterestStandardWidthVideoPin":
+    case "YouTubeBumperAds":
+    case "YouTubeTrueView":
+        return "Video"
+    case "ExportableFastLoadingAnimatedBanner":
+        return "HTML"
+    default:
+        console.error(`Unsupported creative format: '${clazz}'.`)
+        return null
+    }
+}
+
+export function getEagleFormatFromFalconClazz (clazz) {
+    switch (clazz) {
+    case "ExportableImage":
+    case "PinterestStaticPin":
+        return "Image"
+    case "FacebookPhotoAdPost":
+        return "meta.image"
+    case "ExportableVideo":
+    case "PinterestStandardWidthVideoPin":
+        return "Video"
+    case "FacebookVideoAdPost":
+        return "meta.video"
+    case "YouTubeBumperAds":
+    case "YouTubeTrueView":
+        return "youtube.video"
+    case "ExportableFastLoadingAnimatedBanner":
+        return "HTML"
+    default:
+        console.error(`Unsupported creative format: '${clazz}'.`)
+        return null
+    }
+}
+
 export function getEagleTextDecoration (falconTextDecoration) {
     switch (falconTextDecoration) {
     case "underline":
