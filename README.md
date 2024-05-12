@@ -10,11 +10,11 @@ Falcon to Eagle Design File migration extension with quite some known limitation
     - anchoring?
 
 # Installation
-The extension is not (yet) published on the Chrome Web Store. You can clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) or download the ZIP (studio) and manually install the extension by following these steps:
+The extension is not (yet) published on the Chrome Web Store. You can download the [ZIP](https://drive.google.com/file/d/1deo_b8cliPp8AZ2w6N8ax5-sSB67nW8h/view?usp=drive_link) (studio) or clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) and manually install the extension by following these steps:
 1. Open the Google Chrome browser.
 2. Navigate to `chrome://extensions`
 3. Make sure that Developer mode is turned on.
-4. Drag and drop the ZIP to the Chrome Extensions tab.
+4. Drag and drop the ZIP to the Chrome Extensions tab (studio) or click on Load unpacked and point to the repo folder (devs).
 5. For the best experience, pin the extension to your taskbar.
 
 Steps 1, 2, 3, and 4.
