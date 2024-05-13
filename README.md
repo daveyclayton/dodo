@@ -5,6 +5,7 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
 # TODO
+    - transfer all choice outcomes as groups
     - components of the same name and clazz should be the same component in eagle
     - handling of choice components (once they are supported in Eagle)
     - anchoring?

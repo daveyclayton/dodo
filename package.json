@@ -1,7 +1,7 @@
 {
   "name": "birdsofprey",
   "version": "0.0.1",
-  "description": "Morphing falcons into eagles.",
+  "description": "Morphing Falcons into Eagles. Celtra CA v1 to v2 migration extension.",
   "main": "index.js",
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"

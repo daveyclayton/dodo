@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "BirdsOfPrey",
-    "description": "Morphing falcons into eagles.",
+    "description": "Morphing Falcons into Eagles. Celtra CA v1 to v2 migration extension.",
     "version": "1.0",
     "action": {
         "default_popup": "popup/popup.html",
