@@ -3,6 +3,9 @@ export function getVariants (creative) {
 }
 
 export function getVariantDurationInSeconds (variant) {
+    if (variant.master.scenes.length === 0) {
+        return 6000 // return some default duration if we have no scenes
+    }
     return variant.master.scenes[0].duration * 1000
 }
 
