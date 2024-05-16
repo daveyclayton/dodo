@@ -5,6 +5,8 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
 # TODO
+    - transfer newlines in text properly
+    - mimic variant color with rectangle in eagle
     - components of the same name and clazz should be the same component in eagle
     - proper handling of choice components (once they are supported in Eagle)
     - anchoring?

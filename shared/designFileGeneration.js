@@ -51,7 +51,6 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             skewY: generatePropertyObject(0),
             blending: generatePropertyObject("normal"),
             presence: generatePropertyObject(true, [mediaLineItemCompoundKeys[falconComponent.mediaLineItemIndex]], false), // TODO: change when we will be grouping components by name
-            hidden: generatePropertyObject(false),
             locked: generatePropertyObject(false),
             resizingWidth: generatePropertyObject("fixed"),
             resizingHeight: generatePropertyObject("fixed"),
@@ -65,6 +64,8 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false)
     const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false)
     const { x, y } = getXYFromFalconPosition(layoutSpecificValue.position, { width, height }, falconComponent.parentSize)
+
+    eagleComponent.attributes.hidden = generatePropertyObject(!!layoutSpecificValue.hidden, mediaLineItemCompoundKeys)
 
     eagleComponent.attributes.x = generatePropertyObject(x, mediaLineItemCompoundKeys)
     eagleComponent.attributes.y = generatePropertyObject(y, mediaLineItemCompoundKeys)
