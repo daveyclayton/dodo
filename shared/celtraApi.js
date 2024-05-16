@@ -4,6 +4,7 @@ const PLATFORM_DOMAIN = "celtra.io"
 const API_URL = `https://hub.${PLATFORM_DOMAIN}/api/`
 const CACHED_API_URL = `https://cache-ssl.${PLATFORM_DOMAIN}/api/`
 const API_PROXY_URL = "https://request-passthrough-afb95a0643d0.herokuapp.com/api/"
+// const API_PROXY_URL = "https://hub.matic.test/api/" // FOR TESTING
 
 export async function dispatch (path, method = "GET", body = undefined, headers = [], cached = false) {
     const requestHeaders = new Headers()
@@ -112,6 +113,7 @@ export async function fetchBlob (blobhash) {
 
 export async function createDesignFile (accountId, name, zip) {
     const errorMessage = "Failed to create the Design file. Please check your permissions. There might also be an issue with the extension. Please report this with the Falcon Design File ID to #birds-of-prey."
+    // accountId = "gdrkmcjinemf" // FOR TESTING
 
     try {
         const response = await dispatch(`designFiles/upload?accountId=${accountId}&name=${name}`, "POST", zip, [["Content-Type", "application/zip"]])

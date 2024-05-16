@@ -15,7 +15,7 @@ import {
 } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
-const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group"]
+const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group", "NestedContainer"]
 const SUPPORTED_FORMATS = [
     "ExportableImage",
     "ExportableVideo",
@@ -224,6 +224,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         })
         break
     case "Group":
+    case "NestedContainer": // For Choice only, refactor when choices are available in Eagle
         eagleComponent.type = "Group"
         eagleComponent.attributes.fill = generatePropertyObject(falconComponent.background ? getEagleColor(falconComponent.backgroundColor) : null, mediaLineItemCompoundKeys)
         eagleComponent.attributes.overflow = generatePropertyObject("hidden")
@@ -243,25 +244,50 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
 }
 
 function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
-    const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
-    const eagleComponents = [eagleComponent]
-    if (falconComponent.clazz === "Group") {
-        const groupComponents = falconComponent.content.objects
-        groupComponents.sort((a, b) => b.zIndex - a.zIndex)
-        groupComponents.forEach(component => {
+    const getGroupContentEagleComponents = function (objects, group, eagleParentId) {
+        const groupContentEagleComponents = []
+        objects.sort((a, b) => b.zIndex - a.zIndex)
+        objects.forEach(component => {
             // Add info about the parent
-            const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
+            const layoutSpecificValue = group.layoutSpecificValues[0]
             const falconComponentWithParentInfo = {
                 ...component,
-                mediaLineItemIndex: falconComponent.mediaLineItemIndex,
+                mediaLineItemIndex: group.mediaLineItemIndex,
                 parentSize: {
-                    width: convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false),
-                    height: convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false),
+                    width: convertPercentToPx(layoutSpecificValue.size.width, group.parentSize.width, false),
+                    height: convertPercentToPx(layoutSpecificValue.size.height, group.parentSize.height, false),
                 },
-                sceneDuration: falconComponent.sceneDuration,
-                parentId: eagleComponent.id,
+                sceneDuration: group.sceneDuration,
+                parentId: eagleParentId,
             }
-            eagleComponents.push(...getEagleComponentsFromFalconComponent(falconComponentWithParentInfo, files, fonts, platformFonts, mediaLineItemCompoundKeys))
+            groupContentEagleComponents.push(...getEagleComponentsFromFalconComponent(falconComponentWithParentInfo, files, fonts, platformFonts, mediaLineItemCompoundKeys))
+        })
+
+        return groupContentEagleComponents
+    }
+
+    const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+    let eagleComponents = [eagleComponent]
+    if (falconComponent.clazz === "Group") {
+        eagleComponents.push(...getGroupContentEagleComponents(falconComponent.content.objects, falconComponent, eagleComponent.id))
+    } else if (falconComponent.clazz === "ChoiceFeed") {
+        // Transform every choice outcome into a group.
+        // We don't need the initial component that was created since we have to transfer all outcomes as separate groups.
+        eagleComponents = []
+        falconComponent.content.forEach(choiceContent => {
+            // We need to remap some values from both the ChoiceFeed and the child NestedContainer component.
+            const layoutSpecificValues = [{
+                ...choiceContent.layoutSpecificValues[0],
+                ...falconComponent.layoutSpecificValues[0],
+            }]
+            choiceContent = {
+                ...falconComponent,
+                ...choiceContent,
+                layoutSpecificValues,
+            }
+            const eagleGroupComponent = getEagleComponentFromFalconComponent(choiceContent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+            eagleComponents.push(eagleGroupComponent)
+            eagleComponents.push(...getGroupContentEagleComponents(choiceContent.objects, falconComponent, eagleGroupComponent.id))
         })
     }
 

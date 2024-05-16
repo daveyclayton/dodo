@@ -5,9 +5,8 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
 # TODO
-    - transfer all choice outcomes as groups
     - components of the same name and clazz should be the same component in eagle
-    - handling of choice components (once they are supported in Eagle)
+    - proper handling of choice components (once they are supported in Eagle)
     - anchoring?
 
 # Installation
@@ -37,6 +36,7 @@ NOTE: if you close the extension while the migration is in progress the migratio
 # Known limitations:
     - No support for Interactive HTML & Facebook Carousel
     - No Animations (videos will be transferred over with component clip set from 0 to scene duration)
+    - Choice component outcomes will be transferred as regular groups until Eagle supports Choices
     - No Feeds
     - No Auto-layout
     - No HTML fallback image
