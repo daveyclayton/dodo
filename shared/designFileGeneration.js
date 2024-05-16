@@ -479,6 +479,37 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
                 })
             })
             creativeComponents.sort((a, b) => b.zIndex - a.zIndex)
+
+            // mimic backgroundColor as a Shapey component
+            if (variant.backgroundColor) {
+                creativeComponents.push({
+                    clazz: "Shapey",
+                    name: "Background",
+                    aspectRatioLocked: false,
+                    layoutSpecificValues: [
+                        {
+                            size: {
+                                width: "100%",
+                                height: "100%",
+                            },
+                            position: {
+                                left: "0px",
+                                top: "0px",
+                            },
+                            rotation: 0,
+                            opacity: 1,
+                        },
+                    ],
+                    backgroundColor: variant.backgroundColor,
+                    parentSize: {
+                        width: variant.layouts[0].designTimeSize.width,
+                        height: variant.layouts[0].designTimeSize.height,
+                    },
+                    sceneDuration: getVariantDurationInSeconds(variant),
+                    mediaLineItemIndex,
+                })
+            }
+
             falconComponents.push(...creativeComponents)
             mediaLineItemIndex++
         })
