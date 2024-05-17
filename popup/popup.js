@@ -6,7 +6,7 @@ import {
 } from "../shared/celtraApi.js"
 import { generateZip } from "../shared/designFileGeneration.js"
 import { getSync } from "../shared/storage.js"
-import { getCredentials } from "../shared/utils.js"
+import { getCredentials, logExtensionInfo } from "../shared/utils.js"
 
 const designFileInput = document.getElementById("design-file-id")
 const accountInput = document.getElementById("account-id")
@@ -107,3 +107,4 @@ showEnterData()
 designFileInput.addEventListener("keypress", onKeyDown)
 accountInput.addEventListener("keypress", onKeyDown)
 document.getElementById("submit").addEventListener("click", migrate)
+logExtensionInfo()

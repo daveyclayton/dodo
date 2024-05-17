@@ -50,3 +50,9 @@ export async function getCredentials () {
 
     return credentials
 }
+
+export async function logExtensionInfo () {
+    const packageResponse = await fetch("../package.json")
+    const packageJson = await packageResponse.json()
+    console.log(packageJson.name, packageJson.version)
+}
