@@ -209,7 +209,9 @@ function convertRadialGradient (sourceGradient) {
 }
 
 export function getEagleTextObjects (string, textyStyleId) {
-    const stringLines = string.split("\n")
+    const stringLinesActualNewLine = string.split("\n")
+    const stringLinesFalconHardBreak = string.split("\\n")
+    const stringLines = stringLinesActualNewLine.length > stringLinesFalconHardBreak.length ? stringLinesActualNewLine : stringLinesFalconHardBreak
     const eagleTextArray = []
     stringLines.forEach((line, index) => {
         eagleTextArray.push({
