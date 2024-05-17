@@ -12,6 +12,7 @@ import {
     getEagleVerticalTextAlign,
     getEagleDesignUnitFormatFromFalconClazz,
     getEagleFormatFromFalconClazz,
+    getEagleTextObjects,
 } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
@@ -134,20 +135,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.textDirection = generatePropertyObject("auto")
         eagleComponent.attributes.horizontalAlignment = generatePropertyObject(getEagleTextAlign(falconComponent.textAlign), mediaLineItemCompoundKeys)
         eagleComponent.attributes.verticalAlignment = generatePropertyObject(getEagleVerticalTextAlign(falconComponent.textAlignVertical), mediaLineItemCompoundKeys)
-        eagleComponent.attributes.content = generatePropertyObject([
-            {
-                type: "text",
-                text: falconComponent.text,
-                marks: [
-                    {
-                        type: "complexTextStyle",
-                        attrs: {
-                            styleId: textyStyleId,
-                        },
-                    },
-                ],
-            },
-        ], mediaLineItemCompoundKeys)
+        eagleComponent.attributes.content = generatePropertyObject(getEagleTextObjects(falconComponent.text, textyStyleId), mediaLineItemCompoundKeys)
         eagleComponent.styles = [
             {
                 id: textyStyleId,
@@ -501,6 +489,9 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
                         },
                     ],
                     backgroundColor: variant.backgroundColor,
+                    border: variant.borderSize > 0,
+                    borderWidth: variant.borderSize,
+                    borderColor: variant.borderColor,
                     parentSize: {
                         width: variant.layouts[0].designTimeSize.width,
                         height: variant.layouts[0].designTimeSize.height,

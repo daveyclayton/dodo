@@ -207,3 +207,29 @@ function convertRadialGradient (sourceGradient) {
 
     return gradientObject
 }
+
+export function getEagleTextObjects (string, textyStyleId) {
+    const stringLines = string.split("\n")
+    const eagleTextArray = []
+    stringLines.forEach((line, index) => {
+        eagleTextArray.push({
+            type: "text",
+            text: line,
+            marks: [
+                {
+                    type: "complexTextStyle",
+                    attrs: {
+                        styleId: textyStyleId,
+                    },
+                },
+            ],
+        })
+        if (index !== stringLines.length - 1) {
+            eagleTextArray.push({
+                type: "customHardBreak",
+            })
+        }
+    })
+
+    return eagleTextArray
+}
