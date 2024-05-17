@@ -233,3 +233,7 @@ export function getEagleTextObjects (string, textyStyleId) {
 
     return eagleTextArray
 }
+
+export function getAnimatableMediaLineItemCompoundKeys (mediaLineItemCompoundKeys) {
+    return mediaLineItemCompoundKeys.filter(key => !key.toLowerCase().endsWith("image"))
+}

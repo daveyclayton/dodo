@@ -13,6 +13,7 @@ import {
     getEagleDesignUnitFormatFromFalconClazz,
     getEagleFormatFromFalconClazz,
     getEagleTextObjects,
+    getAnimatableMediaLineItemCompoundKeys,
 } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
@@ -202,13 +203,14 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         }
 
         // Video needs a component clip animation for valid schema
+        const animatableMediaLineItemCompoundKeys = getAnimatableMediaLineItemCompoundKeys(mediaLineItemCompoundKeys)
         eagleComponent.animations.push({
             id: generateId(),
             type: "ComponentClip",
             attributes: {
-                presence: generatePropertyObject(true, mediaLineItemCompoundKeys),
-                delay: generatePropertyObject(0, mediaLineItemCompoundKeys),
-                duration: generatePropertyObject(falconComponent.sceneDuration, mediaLineItemCompoundKeys),
+                presence: generatePropertyObject(true, animatableMediaLineItemCompoundKeys, false),
+                delay: generatePropertyObject(0, animatableMediaLineItemCompoundKeys),
+                duration: generatePropertyObject(falconComponent.sceneDuration, animatableMediaLineItemCompoundKeys),
             },
         })
         break
