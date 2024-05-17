@@ -2,6 +2,17 @@ export function getVariants (creative) {
     return creative.units.banner.variants ?? [creative.units.banner]
 }
 
+export function getObjects (variant) {
+    if (variant.master && variant.master.objects && variant.master.objects.length > 0) {
+        return variant.master.objects
+    }
+    if (variant.screens) {
+        return variant.screens[0].objects
+    }
+
+    throw new Error("Cannot find objects in variant", variant)
+}
+
 export function getVariantDurationInSeconds (variant) {
     if (variant.master.scenes.length === 0) {
         return 6000 // return some default duration if we have no scenes

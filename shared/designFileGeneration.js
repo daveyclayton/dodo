@@ -2,7 +2,7 @@
 import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
 import { generateId, getInt, convertPercentToPx } from "./utils.js"
-import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getVariantDurationInSeconds } from "./falconUtils.js"
+import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getVariantDurationInSeconds, getObjects } from "./falconUtils.js"
 import {
     getXYFromFalconPosition,
     getEagleColor,
@@ -22,6 +22,7 @@ const SUPPORTED_FORMATS = [
     "ExportableImage",
     "ExportableVideo",
     "ExportableFastLoadingAnimatedBanner",
+    "ExportableFastLoadingCrossScreenBanner",
     "FacebookPhotoAdPost",
     "FacebookVideoAdPost",
     "PinterestStaticPin",
@@ -457,7 +458,7 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
     creatives.forEach(creative => {
         getVariants(creative).forEach(variant => {
             const creativeComponents = []
-            variant.master.objects.forEach(object => {
+            getObjects(variant).forEach(object => {
                 creativeComponents.push({
                     ...object,
                     parentSize: {

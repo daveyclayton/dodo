@@ -34,7 +34,8 @@ Step 5.
 NOTE: if you close the extension while the migration is in progress the migration will stop.
 
 # Known limitations:
-    - No support for Interactive HTML & Facebook Carousel
+    - No support for Facebook Carousel
+    - Interactive HTML will not transfer events, actions, unsupported components (Swipey), and will only transfer the Start screen
     - No Animations (videos will be transferred over with component clip set from 0 to scene duration)
     - Choice component outcomes will be transferred as regular groups until Eagle supports Choices
     - No Feeds

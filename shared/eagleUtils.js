@@ -63,6 +63,7 @@ export function getEagleDesignUnitFormatFromFalconClazz (clazz) {
     case "YouTubeTrueView":
         return "Video"
     case "ExportableFastLoadingAnimatedBanner":
+    case "ExportableFastLoadingCrossScreenBanner":
         return "HTML"
     default:
         console.error(`Unsupported creative format: '${clazz}'.`)
@@ -86,6 +87,7 @@ export function getEagleFormatFromFalconClazz (clazz) {
     case "YouTubeTrueView":
         return "youtube.video"
     case "ExportableFastLoadingAnimatedBanner":
+    case "ExportableFastLoadingCrossScreenBanner":
         return "HTML"
     default:
         console.error(`Unsupported creative format: '${clazz}'.`)
