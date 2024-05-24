@@ -5,6 +5,7 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
 # TODO
+    - special control characters (no break, etc.) don't transfer okay
     - components of the same name and clazz should be the same component in eagle
     - proper handling of choice components (once they are supported in Eagle)
     - anchoring?
@@ -29,7 +30,7 @@ Step 5.
 3. Enter the Falcon Design File ID you want to migrate and the destination account ID where the Eagle Design File should be created. Click migrate 🚀
 4. Check the created Eagle Design File and adjust it to be pixel perfect. Please note the Known limitations of the migration extension listed below.
 5. If something does not work, you are encountering issues, or you would like to submit a suggestion (perhaps a missing feature not listed in Known limitations or something else), please post to the `#birds-of-prey` slack channel.
-6. You can always update the API App details by right clicking the extension icon and clicking on the 'Options' menu item.
+6. You can update the API App details by right-clicking the extension icon and clicking the 'Options' menu item.
 
 NOTE: if you close the extension while the migration is in progress the migration will stop.
 

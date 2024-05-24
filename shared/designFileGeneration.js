@@ -52,7 +52,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             aspectRatioLocked: generatePropertyObject(falconComponent.aspectRatioLocked ?? false, mediaLineItemCompoundKeys),
             skewX: generatePropertyObject(0),
             skewY: generatePropertyObject(0),
-            blending: generatePropertyObject("normal"),
+            blending: generatePropertyObject(falconComponent.blendingMode ?? "normal", mediaLineItemCompoundKeys),
             presence: generatePropertyObject(true, [mediaLineItemCompoundKeys[falconComponent.mediaLineItemIndex]], false), // TODO: change when we will be grouping components by name
             locked: generatePropertyObject(false),
             resizingWidth: generatePropertyObject("fixed"),
