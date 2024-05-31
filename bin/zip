@@ -1,3 +1,3 @@
 #!/bin/bash
 
-zip -r birdsOfPrey.zip .
+zip -r birdsOfPrey.zip . -x "./node_modules/*" "./.git/*"
