@@ -48,7 +48,7 @@ export async function fetchCreatives (designFileId) {
     const errorMessage = `Failed to fetch creatives of Design file '${designFileId}'. Please check the ID and your permissions.`
 
     try {
-        const response = await dispatch(`creatives?returnFullUnits=1&templateBatchId=${designFileId}`)
+        const response = await dispatch(`creatives?returnFullUnits=1&isArchived=0&isDeleted=0&templateBatchId=${designFileId}`)
         const responseJson = await response.json()
         if (responseJson.length === 0) {
             throw new Error(`${errorMessage} The response was an empty array.`)

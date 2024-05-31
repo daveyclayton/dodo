@@ -7,6 +7,10 @@ export function getObjects (variant) {
         return variant.master.objects
     }
     if (variant.screens) {
+        if (variant.screens.length === 0) {
+            return []
+        }
+
         return variant.screens[0].objects
     }
 
