@@ -174,6 +174,17 @@ function convertLinearGradient (sourceGradient) {
     return gradientObject
 }
 
+export function convertFittingSize (fittingSize) {
+    switch (fittingSize) {
+    case "fit":
+        return "fit"
+    case "stretch":
+        return "fill"
+    default:
+        return "fit"
+    }
+}
+
 function convertRadialGradient (sourceGradient) {
     const shapeSizePositionRegex = /(\w+)\s(\d+)%\s(\d+)%\sat\s(\d+)%\s(\d+)%/
     const shapeSizePositionMatch = sourceGradient.match(shapeSizePositionRegex)

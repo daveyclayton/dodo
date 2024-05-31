@@ -14,6 +14,7 @@ import {
     getEagleFormatFromFalconClazz,
     getEagleTextObjects,
     getAnimatableMediaLineItemCompoundKeys,
+    convertFittingSize,
 } from "./eagleUtils.js"
 
 const DESIGN_FILE_VERSION = 85
@@ -152,7 +153,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         break
     case "Picture":
         eagleComponent.type = "Picture"
-        eagleComponent.attributes.fitting = generatePropertyObject(falconComponent.fittingSize, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fitting = generatePropertyObject(convertFittingSize(falconComponent.fittingSize), mediaLineItemCompoundKeys)
         eagleComponent.attributes.backgroundPosition = generatePropertyObject({
             x: "center",
             y: "center",
