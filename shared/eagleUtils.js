@@ -1,11 +1,16 @@
 import { getFloat, convertPercentToPx } from "./utils.js"
 
 export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null, dependsOn = "canvas") {
+    let mappedDefaultValue = defaultValue ?? value
+    if (mappedDefaultValue === "null") {
+        mappedDefaultValue = null
+    }
+
     const propertyObject = {
         markedForScaling: false,
         dependsOn: dependsOn,
         values: {
-            default: defaultValue ?? value,
+            default: mappedDefaultValue,
         },
     }
 
