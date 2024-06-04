@@ -7,6 +7,7 @@ import {
     getXYFromFalconPosition,
     getEagleColor,
     generatePropertyObject,
+    generatePropertyObjectFromComponent,
     getEagleTextAlign,
     getEagleTextDecoration,
     getEagleVerticalTextAlign,
@@ -30,6 +31,7 @@ function getEligibleCreatives (creatives) {
 }
 
 function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
+    const compoundKeysWhereComponentIsPresent = mediaLineItemCompoundKeys.filter((key, index) => index == Object.keys(falconComponent.componentValues))
     const eagleComponent = {
         id: generateId(),
         name: falconComponent.name,
@@ -37,11 +39,11 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         attributes: {
             horizontalAnchoring: generatePropertyObject("left"),
             verticalAnchoring: generatePropertyObject("top"),
-            aspectRatioLocked: generatePropertyObject(falconComponent.aspectRatioLocked ?? false, mediaLineItemCompoundKeys),
+            aspectRatioLocked: generatePropertyObjectFromComponent(falconComponent, "aspectRatioLocked", mediaLineItemCompoundKeys, false),
             skewX: generatePropertyObject(0),
             skewY: generatePropertyObject(0),
-            blending: generatePropertyObject(falconComponent.blendingMode ?? "normal", mediaLineItemCompoundKeys),
-            presence: generatePropertyObject(true, [mediaLineItemCompoundKeys[falconComponent.mediaLineItemIndex]], false), // TODO: change when we will be grouping components by name
+            blending: generatePropertyObjectFromComponent(falconComponent, "blendingMode", mediaLineItemCompoundKeys, "normal"),
+            presence: generatePropertyObject(true, compoundKeysWhereComponentIsPresent, false),
             locked: generatePropertyObject(false),
             resizingWidth: generatePropertyObject("fixed"),
             resizingHeight: generatePropertyObject("fixed"),
@@ -51,58 +53,56 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         },
     }
 
-    const layoutSpecificValue = falconComponent.layoutSpecificValues[0]
-    const width = convertPercentToPx(layoutSpecificValue.size.width, falconComponent.parentSize.width, false)
-    const height = convertPercentToPx(layoutSpecificValue.size.height, falconComponent.parentSize.height, false)
-    const { x, y } = getXYFromFalconPosition(layoutSpecificValue.position, { width, height }, falconComponent.parentSize)
+    eagleComponent.attributes.hidden = generatePropertyObjectFromComponent(falconComponent, "hidden", mediaLineItemCompoundKeys, false, (c) => !!c.layoutSpecificValues[0].hidden)
+    eagleComponent.attributes.x = generatePropertyObjectFromComponent(falconComponent, "x", mediaLineItemCompoundKeys, 0, (c) => {
+        const layoutSpecificValue = c.layoutSpecificValues[0]
+        const width = convertPercentToPx(layoutSpecificValue.size.width, c.parentSize.width, false)
+        const height = convertPercentToPx(layoutSpecificValue.size.height, c.parentSize.height, false)
+        const { x } = getXYFromFalconPosition(layoutSpecificValue.position, { width, height }, c.parentSize)
+        return x
+    })
+    eagleComponent.attributes.y = generatePropertyObjectFromComponent(falconComponent, "y", mediaLineItemCompoundKeys, 0, (c) => {
+        const layoutSpecificValue = c.layoutSpecificValues[0]
+        const width = convertPercentToPx(layoutSpecificValue.size.width, c.parentSize.width, false)
+        const height = convertPercentToPx(layoutSpecificValue.size.height, c.parentSize.height, false)
+        const { y } = getXYFromFalconPosition(layoutSpecificValue.position, { width, height }, c.parentSize)
+        return y
+    })
+    eagleComponent.attributes.width = generatePropertyObjectFromComponent(falconComponent, "width", mediaLineItemCompoundKeys, 100, (c) => {
+        const layoutSpecificValue = c.layoutSpecificValues[0]
+        return convertPercentToPx(layoutSpecificValue.size.width, c.parentSize.width, false)
+    })
+    eagleComponent.attributes.height = generatePropertyObjectFromComponent(falconComponent, "height", mediaLineItemCompoundKeys, 100, (c) => {
+        const layoutSpecificValue = c.layoutSpecificValues[0]
+        return convertPercentToPx(layoutSpecificValue.size.height, c.parentSize.height, false)
+    })
+    eagleComponent.attributes.rotation = generatePropertyObjectFromComponent(falconComponent, "rotation", mediaLineItemCompoundKeys, 0, (c) => c.layoutSpecificValues[0].rotation)
+    eagleComponent.attributes.opacity = generatePropertyObjectFromComponent(falconComponent, "opacity", mediaLineItemCompoundKeys, 100, (c) => c.layoutSpecificValues[0].opacity)
 
-    eagleComponent.attributes.hidden = generatePropertyObject(!!layoutSpecificValue.hidden, mediaLineItemCompoundKeys)
-
-    eagleComponent.attributes.x = generatePropertyObject(x, mediaLineItemCompoundKeys)
-    eagleComponent.attributes.y = generatePropertyObject(y, mediaLineItemCompoundKeys)
-    eagleComponent.attributes.width = generatePropertyObject(width, mediaLineItemCompoundKeys)
-    eagleComponent.attributes.height = generatePropertyObject(height, mediaLineItemCompoundKeys)
-    eagleComponent.attributes.rotation = generatePropertyObject(layoutSpecificValue.rotation, mediaLineItemCompoundKeys)
-    eagleComponent.attributes.opacity = generatePropertyObject(layoutSpecificValue.opacity, mediaLineItemCompoundKeys)
-
-    if (falconComponent.shadow) {
-        eagleComponent.attributes.shadowX = generatePropertyObject(falconComponent.shadowDistance, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowY = generatePropertyObject(falconComponent.shadowDistance, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowColor = generatePropertyObject(getEagleColor(falconComponent.shadowColor), mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowBlur = generatePropertyObject(falconComponent.shadowBlur, mediaLineItemCompoundKeys)
-    } else {
-        // Weird eagle default values
-        eagleComponent.attributes.shadowX = generatePropertyObject(0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowY = generatePropertyObject(0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowColor = generatePropertyObject(null, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shadowBlur = generatePropertyObject(4, mediaLineItemCompoundKeys)
-    }
+    eagleComponent.attributes.shadowX = generatePropertyObjectFromComponent(falconComponent, "shadowDistance", mediaLineItemCompoundKeys, 0, (c) => c.shadow ? c.shadowDistance : 0)
+    eagleComponent.attributes.shadowY = generatePropertyObjectFromComponent(falconComponent, "shadowDistance", mediaLineItemCompoundKeys, 0, (c) => c.shadow ? c.shadowDistance : 0)
+    eagleComponent.attributes.shadowColor = generatePropertyObjectFromComponent(falconComponent, "shadowColor", mediaLineItemCompoundKeys, null, (c) => c.shadow ? c.shadowColor : null)
+    eagleComponent.attributes.shadowBlur = generatePropertyObjectFromComponent(falconComponent, "shadowBlur", mediaLineItemCompoundKeys, 4, (c) => c.shadow ? c.shadowBlur : 4)
 
     if (COMPONENTS_WITH_STROKE.includes(falconComponent.clazz)) {
-        eagleComponent.attributes.strokeRadius = generatePropertyObject(falconComponent.roundness ?? 0, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.strokeRadius = generatePropertyObjectFromComponent(falconComponent, "roundness", mediaLineItemCompoundKeys, 0, (c) => c.roundness ?? 0)
         eagleComponent.attributes.strokePosition = generatePropertyObject("inside")
-        if (falconComponent.border) {
-            eagleComponent.attributes.strokeWidth = generatePropertyObject(falconComponent.borderWidth, mediaLineItemCompoundKeys)
-            eagleComponent.attributes.strokeFill = generatePropertyObject(getEagleColor(falconComponent.borderColor), mediaLineItemCompoundKeys)
-        } else {
-            eagleComponent.attributes.strokeWidth = generatePropertyObject(null, mediaLineItemCompoundKeys)
-            eagleComponent.attributes.strokeFill = generatePropertyObject(null, mediaLineItemCompoundKeys)
-        }
+        eagleComponent.attributes.strokeWidth = generatePropertyObjectFromComponent(falconComponent, "borderWidth", mediaLineItemCompoundKeys, null, (c) => c.border ? c.borderWidth : null)
+        eagleComponent.attributes.strokeFill = generatePropertyObjectFromComponent(falconComponent, "borderColor", mediaLineItemCompoundKeys, null, (c) => c.border ? c.borderColor : null)
     }
 
     switch (falconComponent.clazz) {
     case "Texty":
         const textyStyleId = generateId()
-        const platformFontBlobHash = getPlatformFontBlobHash(falconComponent.fontLocalId, fonts, platformFonts)
         const textStyleAttributes = {
-            fontSize: generatePropertyObject(getInt(falconComponent.fontSize), mediaLineItemCompoundKeys),
+            fontSize: generatePropertyObjectFromComponent(falconComponent, "fontSize", mediaLineItemCompoundKeys, "15px", (c) => getInt(c.fontSize)),
             letterSpacing: generatePropertyObject({ value: 0, unit: "%" }, mediaLineItemCompoundKeys),
             lineHeight: generatePropertyObject({ value: 100, unit: "%" } ),
-            decoration: generatePropertyObject(getEagleTextDecoration(falconComponent.textDecoration), mediaLineItemCompoundKeys),
+            decoration: generatePropertyObjectFromComponent(falconComponent, "textDecoration", mediaLineItemCompoundKeys, null, (c) => getEagleTextDecoration(c.textDecoration)),
             transform: generatePropertyObject(null),
-            fill: generatePropertyObject(getEagleColor(falconComponent.textColor), mediaLineItemCompoundKeys),
-            strokeFill: generatePropertyObject(falconComponent.textStroke ? getEagleColor(falconComponent.textStrokeColor) : null, mediaLineItemCompoundKeys),
-            strokeWidth: generatePropertyObject(falconComponent.textStroke ? falconComponent.textStrokeSize : null, mediaLineItemCompoundKeys),
+            fill: generatePropertyObjectFromComponent(falconComponent, "textColor", mediaLineItemCompoundKeys, "#FFFFFF", (c) => getEagleColor(c.textColor), mediaLineItemCompoundKeys),
+            strokeFill: generatePropertyObjectFromComponent(falconComponent, "textStrokeColor", mediaLineItemCompoundKeys, null, (c) => c.textStroke ? getEagleColor(c.textStrokeColor) : null),
+            strokeWidth: generatePropertyObjectFromComponent(falconComponent, "textStrokeSize", mediaLineItemCompoundKeys, null, (c) => c.textStrokeSize ?? null),
             strokePosition: generatePropertyObject("inside", mediaLineItemCompoundKeys),
             highlightFill: generatePropertyObject(null),
             highlightLeftPadding: generatePropertyObject(0),
@@ -110,22 +110,22 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             highlightTopPadding: generatePropertyObject(0),
             highlightBottomPadding: generatePropertyObject(0),
             highlightBorderRadius: generatePropertyObject(0),
-            appleFontTracking: generatePropertyObject(falconComponent.useAppleFontTrackingValue ?? false, mediaLineItemCompoundKeys),
-            fontBlobHash: generatePropertyObject(platformFontBlobHash),
+            appleFontTracking: generatePropertyObjectFromComponent(falconComponent, "useAppleFontTrackingValue", mediaLineItemCompoundKeys, false, (c) => c.useAppleFontTrackingValue ?? false),
+            fontBlobHash: generatePropertyObjectFromComponent(falconComponent, "platformFontBlobHash", mediaLineItemCompoundKeys, null, (c) => getPlatformFontBlobHash(c.fontLocalId, fonts, platformFonts)),
         }
 
         eagleComponent.type = "Texty"
-        eagleComponent.attributes.paddingTop = generatePropertyObject(falconComponent.textPaddingTop ?? 0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.paddingBottom = generatePropertyObject(falconComponent.textPaddingBottom ?? 0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.paddingLeft = generatePropertyObject(falconComponent.textPaddingLeft ?? 0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.paddingRight = generatePropertyObject(falconComponent.textPaddingRight ?? 0, mediaLineItemCompoundKeys)
-        eagleComponent.attributes.shrinkToFit = generatePropertyObject(falconComponent.responsiveFont)
+        eagleComponent.attributes.paddingTop = generatePropertyObjectFromComponent(falconComponent, "textPaddingTop", mediaLineItemCompoundKeys, 0, (c) => c.textPaddingTop ?? 0)
+        eagleComponent.attributes.paddingBottom = generatePropertyObjectFromComponent(falconComponent, "textPaddingBottom", mediaLineItemCompoundKeys, 0, (c) => c.textPaddingBottom ?? 0)
+        eagleComponent.attributes.paddingLeft = generatePropertyObjectFromComponent(falconComponent, "textPaddingLeft", mediaLineItemCompoundKeys, 0, (c) => c.textPaddingLeft ?? 0)
+        eagleComponent.attributes.paddingRight = generatePropertyObjectFromComponent(falconComponent, "textPaddingRight", mediaLineItemCompoundKeys, 0, (c) => c.textPaddingRight ?? 0)
+        eagleComponent.attributes.shrinkToFit = generatePropertyObjectFromComponent(falconComponent, "responsiveFont", mediaLineItemCompoundKeys, false)
         eagleComponent.attributes.resizingWidth = generatePropertyObject("hugContent")
         eagleComponent.attributes.resizingHeight = generatePropertyObject("hugContent")
         eagleComponent.attributes.textDirection = generatePropertyObject("auto")
-        eagleComponent.attributes.horizontalAlignment = generatePropertyObject(getEagleTextAlign(falconComponent.textAlign), mediaLineItemCompoundKeys)
-        eagleComponent.attributes.verticalAlignment = generatePropertyObject(getEagleVerticalTextAlign(falconComponent.textAlignVertical), mediaLineItemCompoundKeys)
-        eagleComponent.attributes.content = generatePropertyObject(getEagleTextObjects(falconComponent.text, textyStyleId), mediaLineItemCompoundKeys)
+        eagleComponent.attributes.horizontalAlignment = generatePropertyObjectFromComponent(falconComponent, "textAlign", mediaLineItemCompoundKeys, "left", (c) => getEagleTextAlign(c.textAlign))
+        eagleComponent.attributes.verticalAlignment = generatePropertyObjectFromComponent(falconComponent, "textAlignVertical", mediaLineItemCompoundKeys, "top", (c) => getEagleVerticalTextAlign(c.textAlignVertical))
+        eagleComponent.attributes.content = generatePropertyObjectFromComponent(falconComponent, "text", mediaLineItemCompoundKeys, null, (c) => getEagleTextObjects(c.text, textyStyleId))
         eagleComponent.styles = [
             {
                 id: textyStyleId,
@@ -136,11 +136,11 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         break
     case "Shapey":
         eagleComponent.type = "Rectangle"
-        eagleComponent.attributes.fill = generatePropertyObject(getEagleColor(falconComponent.backgroundColor), mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fill = generatePropertyObjectFromComponent(falconComponent, "backgrounColor", mediaLineItemCompoundKeys, null, (c) => getEagleColor(c.backgroundColor))
         break
     case "Picture":
         eagleComponent.type = "Picture"
-        eagleComponent.attributes.fitting = generatePropertyObject(convertFittingSize(falconComponent.fittingSize), mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fitting = generatePropertyObjectFromComponent(falconComponent, "fittingSize", mediaLineItemCompoundKeys, "fit", (c) => convertFittingSize(c.fittingSize))
         eagleComponent.attributes.backgroundPosition = generatePropertyObject({
             x: "center",
             y: "center",
@@ -161,19 +161,21 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             rotation: 0,
         }, mediaLineItemCompoundKeys)
 
-        if (falconComponent.fileLocalId) {
-            const file = files.find(f => f.localId === falconComponent.fileLocalId)
-            eagleComponent.attributes.image = generatePropertyObject({
+        const pictureFileExtractor = (c) => {
+            if (!c.fileLocalId) {
+                return null
+            }
+            const file = files.find(f => f.localId === c.fileLocalId)
+            return {
                 name: file?.name,
                 blobHash: file?.blobHash,
-            }, mediaLineItemCompoundKeys)
-        } else {
-            eagleComponent.attributes.image = generatePropertyObject(null, mediaLineItemCompoundKeys)
+            }
         }
+        eagleComponent.attributes.image = generatePropertyObjectFromComponent(falconComponent, "fileLocalId", mediaLineItemCompoundKeys, null, pictureFileExtractor)
         break
     case "VideoAsset":
         eagleComponent.type = "Video"
-        eagleComponent.attributes.fitting = generatePropertyObject(falconComponent.fitting, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fitting = generatePropertyObjectFromComponent(falconComponent, "fitting", mediaLineItemCompoundKeys)
         eagleComponent.attributes.volume = generatePropertyObject(1, mediaLineItemCompoundKeys)
         eagleComponent.attributes.isAudioDetached = generatePropertyObject(false, mediaLineItemCompoundKeys)
         eagleComponent.attributes.backgroundPosition = generatePropertyObject({
@@ -181,15 +183,17 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             y: "center",
         }, mediaLineItemCompoundKeys)
 
-        if (falconComponent.videoLocalId) {
-            const file = files.find(f => f.localId === falconComponent.videoLocalId)
-            eagleComponent.attributes.video = generatePropertyObject({
+        const videoFileExtractor = (c) => {
+            if (!c.videoLocalId) {
+                return null
+            }
+            const file = files.find(f => f.localId === c.videoLocalId)
+            return {
                 name: file?.name,
                 blobHash: file?.blobHash,
-            }, mediaLineItemCompoundKeys)
-        } else {
-            eagleComponent.attributes.video = generatePropertyObject(null, mediaLineItemCompoundKeys)
+            }
         }
+        eagleComponent.attributes.video = generatePropertyObjectFromComponent(falconComponent, "videoLocalId", mediaLineItemCompoundKeys, null, videoFileExtractor)
 
         // Video needs a component clip animation for valid schema
         const animatableMediaLineItemCompoundKeys = getAnimatableMediaLineItemCompoundKeys(mediaLineItemCompoundKeys)
@@ -206,7 +210,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     case "Group":
     case "NestedContainer": // For Choice only, refactor when choices are available in Eagle
         eagleComponent.type = "Group"
-        eagleComponent.attributes.fill = generatePropertyObject(falconComponent.background ? getEagleColor(falconComponent.backgroundColor) : null, mediaLineItemCompoundKeys)
+        eagleComponent.attributes.fill = generatePropertyObjectFromComponent(falconComponent, "backgroundColor", mediaLineItemCompoundKeys, null, (c) => c.background ? getEagleColor(c.backgroundColor) : null)
         eagleComponent.attributes.overflow = generatePropertyObject("hidden")
         eagleComponent.attributes.layout = generatePropertyObject("manual")
         eagleComponent.attributes.spacing = generatePropertyObject(10)
@@ -249,6 +253,7 @@ function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, p
     const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
     let eagleComponents = [eagleComponent]
     if (falconComponent.clazz === "Group") {
+        // TODO: fix
         eagleComponents.push(...getGroupContentEagleComponents(falconComponent.content.objects, falconComponent, eagleComponent.id))
     } else if (falconComponent.clazz === "ChoiceFeed") {
         // Transform every choice outcome into a group.
@@ -497,21 +502,29 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
         })
     })
 
+    console.log(falconComponents)
+    const falconComponentsByNameAndClazz = {}
+    falconComponents.forEach(component => {
+        const { clazz, name, parentId, ...properties } = component
+        const key = `${clazz} - ${component.name}`
+        if (!falconComponentsByNameAndClazz[key]) {
+            falconComponentsByNameAndClazz[key] = {
+                clazz: clazz,
+                name: name,
+                parentId: parentId,
+                componentValues: [],
+            }
+        }
+        falconComponentsByNameAndClazz[key].componentValues[component.mediaLineItemIndex.toString()] = properties
+    })
+    console.log(falconComponentsByNameAndClazz)
+
     const canvasComponents = []
-    falconComponents.forEach(falconComponent => {
+    Object.values(falconComponentsByNameAndClazz).forEach(falconComponent => {
         const eagleCanvasComponents = getEagleComponentsFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
         const eligibleComponents = eagleCanvasComponents.filter(c => !!c)
         canvasComponents.push(...eligibleComponents)
     })
-
-    // const falconComponentsByNameAndClazz = {}
-    // falconComponents.forEach(component => {
-    //     const key = `${component.clazz} - ${component.name}`
-    //     if (!falconComponentsByNameAndClazz[key]) {
-    //         falconComponentsByNameAndClazz[key] = []
-    //     }
-    //     falconComponentsByNameAndClazz[key].push(component)
-    // })
 
     return canvasComponents
 }

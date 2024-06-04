@@ -20,6 +20,29 @@ export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], d
     return propertyObject
 }
 
+export function generatePropertyObjectFromComponent (falconComponent, propertyName, mediaLineItemCompoundKeys = [], defaultValue = null, extractorFunction = null) {
+    const propertyObject = {
+        markedForScaling: false,
+        dependsOn: "canvas",
+        values: {
+            default: defaultValue ?? falconComponent.componentValues[Object.keys(falconComponent.componentValues)[0]][propertyName],
+        },
+    }
+
+    mediaLineItemCompoundKeys.forEach((key, index) => {
+        const valuesForIndexExist = !!falconComponent.componentValues[index]
+        if (valuesForIndexExist) {
+            let propertyValue = falconComponent.componentValues[index][propertyName] ?? defaultValue
+            if (extractorFunction) {
+                propertyValue = extractorFunction(falconComponent.componentValues[index]) ?? defaultValue
+            }
+            propertyObject.values[key] = propertyValue
+        }
+    })
+
+    return propertyObject
+}
+
 export function getXYFromFalconPosition (position, size, parentSize) {
     let left, top
     if (position.hcenter) {
