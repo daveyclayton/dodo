@@ -16,21 +16,8 @@ import {
     getAnimatableMediaLineItemCompoundKeys,
     convertFittingSize,
 } from "./eagleUtils.js"
+import { SUPPORTED_FORMATS, DESIGN_FILE_VERSION, COMPONENTS_WITH_STROKE } from "./constants.js"
 
-const DESIGN_FILE_VERSION = 85
-const COMPONENTS_WITH_STROKE = ["Shapey", "Picture", "Group", "NestedContainer"]
-const SUPPORTED_FORMATS = [
-    "ExportableImage",
-    "ExportableVideo",
-    "ExportableFastLoadingAnimatedBanner",
-    "ExportableFastLoadingCrossScreenBanner",
-    "FacebookPhotoAdPost",
-    "FacebookVideoAdPost",
-    "PinterestStaticPin",
-    "PinterestStandardWidthVideoPin",
-    "YouTubeBumperAds",
-    "YouTubeTrueView",
-]
 let orderIndexIndex = 0
 let orderIndexes = []
 
