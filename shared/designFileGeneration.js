@@ -47,7 +47,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             resizingHeight: generatePropertyObject("fixed"),
             blur: generatePropertyObject(null),
             orderIndex: generatePropertyObject(orderIndexes[orderIndexIndex++], mediaLineItemCompoundKeys),
-            parentId: generatePropertyObject(falconComponent.parentId ?? null),
+            parentId: generatePropertyObject(falconComponent.parentId ?? null, mediaLineItemCompoundKeys, null),
         },
     }
 
