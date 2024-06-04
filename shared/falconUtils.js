@@ -1,3 +1,5 @@
+import { DEFAULT_FONT_BLOB_HASH } from "./constants.js"
+
 export function getVariants (creative) {
     return creative.units.banner.variants ?? [creative.units.banner]
 }
@@ -28,7 +30,7 @@ export function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
     const fontTypefaceId = fonts.find(f => f.localId === fontLocalId)?.typefaceId
     const font = platformFonts.find(f => f.id === fontTypefaceId)
     if (!font.files) {
-        return "e712e715f828844e3eb493b74e3bf657b71660aa98505ce7581f7cbe889d9f83" // Roboto regular
+        return DEFAULT_FONT_BLOB_HASH
     }
     if (font.files.ttf && font.files.ttf.blobHash) {
         return font.files.ttf.blobHash

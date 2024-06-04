@@ -1,14 +1,23 @@
 import { getFloat, convertPercentToPx } from "./utils.js"
 
-export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null, dependsOn = "canvas") {
-    const propertyObject = {
+function getInitialPropertyObject (dependsOn, defaultValue) {
+    return {
         markedForScaling: false,
         dependsOn: dependsOn,
         values: {
-            default: defaultValue ?? value,
+            default: defaultValue,
         },
     }
 
+}
+
+export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null, dependsOn = "canvas") {
+    let mappedDefaultValue = defaultValue ?? value ?? null
+    if (mappedDefaultValue === "null") {
+        mappedDefaultValue = null
+    }
+
+    const propertyObject = getInitialPropertyObject(dependsOn, mappedDefaultValue)
     if (dependsOn === "content") {
         propertyObject.dimensions = []
     }
@@ -21,20 +30,18 @@ export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], d
 }
 
 export function generatePropertyObjectFromComponent (falconComponent, propertyName, mediaLineItemCompoundKeys = [], defaultValue = null, extractorFunction = null) {
-    const propertyObject = {
-        markedForScaling: false,
-        dependsOn: "canvas",
-        values: {
-            default: defaultValue ?? falconComponent.componentValues[Object.keys(falconComponent.componentValues)[0]][propertyName],
-        },
+    let mappedDefaultValue = defaultValue ?? falconComponent.componentValues[Object.keys(falconComponent.componentValues)[0]][propertyName] ?? null
+    if (mappedDefaultValue === "null") {
+        mappedDefaultValue = null
     }
 
+    const propertyObject = getInitialPropertyObject("canvas", mappedDefaultValue)
     mediaLineItemCompoundKeys.forEach((key, index) => {
         const valuesForIndexExist = !!falconComponent.componentValues[index]
         if (valuesForIndexExist) {
-            let propertyValue = falconComponent.componentValues[index][propertyName] ?? defaultValue
+            let propertyValue = falconComponent.componentValues[index][propertyName] ?? mappedDefaultValue
             if (extractorFunction) {
-                propertyValue = extractorFunction(falconComponent.componentValues[index]) ?? defaultValue
+                propertyValue = extractorFunction(falconComponent.componentValues[index])
             }
             propertyObject.values[key] = propertyValue
         }

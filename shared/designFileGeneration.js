@@ -17,7 +17,12 @@ import {
     getAnimatableMediaLineItemCompoundKeys,
     convertFittingSize,
 } from "./eagleUtils.js"
-import { SUPPORTED_FORMATS, DESIGN_FILE_VERSION, COMPONENTS_WITH_STROKE } from "./constants.js"
+import {
+    SUPPORTED_FORMATS,
+    DESIGN_FILE_VERSION,
+    COMPONENTS_WITH_STROKE,
+    DEFAULT_FONT_BLOB_HASH,
+} from "./constants.js"
 
 let orderIndexIndex = 0
 let orderIndexes = []
@@ -31,7 +36,7 @@ function getEligibleCreatives (creatives) {
 }
 
 function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
-    const compoundKeysWhereComponentIsPresent = mediaLineItemCompoundKeys.filter((key, index) => index == Object.keys(falconComponent.componentValues))
+    const compoundKeysWhereComponentIsPresent = mediaLineItemCompoundKeys.filter((key, index) => Object.keys(falconComponent.componentValues).some(i => i == index))
     const eagleComponent = {
         id: generateId(),
         name: falconComponent.name,
@@ -48,8 +53,15 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             resizingWidth: generatePropertyObject("fixed"),
             resizingHeight: generatePropertyObject("fixed"),
             blur: generatePropertyObject(null),
-            orderIndex: generatePropertyObject(orderIndexes[orderIndexIndex++], mediaLineItemCompoundKeys),
-            parentId: generatePropertyObject(falconComponent.parentId ?? null),
+            orderIndex: generatePropertyObjectFromComponent(falconComponent, "zIndex", mediaLineItemCompoundKeys, orderIndexes[orderIndexIndex++], (c) => {
+                if (c.zIndex) {
+                    const orderIndexIndex = orderIndexes.length - 1 - c.zIndex
+                    return orderIndexes[orderIndexIndex]
+                } else {
+                    return orderIndexes[orderIndexes.length - 1]
+                }
+            }),
+            parentId: generatePropertyObjectFromComponent(falconComponent, "parentId", mediaLineItemCompoundKeys, "null", (c) => c.parentId ?? null),
         },
     }
 
@@ -95,14 +107,14 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     case "Texty":
         const textyStyleId = generateId()
         const textStyleAttributes = {
-            fontSize: generatePropertyObjectFromComponent(falconComponent, "fontSize", mediaLineItemCompoundKeys, "15px", (c) => getInt(c.fontSize)),
+            fontSize: generatePropertyObjectFromComponent(falconComponent, "fontSize", mediaLineItemCompoundKeys, 15, (c) => getInt(c.fontSize)),
             letterSpacing: generatePropertyObject({ value: 0, unit: "%" }, mediaLineItemCompoundKeys),
             lineHeight: generatePropertyObject({ value: 100, unit: "%" } ),
-            decoration: generatePropertyObjectFromComponent(falconComponent, "textDecoration", mediaLineItemCompoundKeys, null, (c) => getEagleTextDecoration(c.textDecoration)),
+            decoration: generatePropertyObjectFromComponent(falconComponent, "textDecoration", mediaLineItemCompoundKeys, "null", (c) => getEagleTextDecoration(c.textDecoration)),
             transform: generatePropertyObject(null),
             fill: generatePropertyObjectFromComponent(falconComponent, "textColor", mediaLineItemCompoundKeys, "#FFFFFF", (c) => getEagleColor(c.textColor), mediaLineItemCompoundKeys),
-            strokeFill: generatePropertyObjectFromComponent(falconComponent, "textStrokeColor", mediaLineItemCompoundKeys, null, (c) => c.textStroke ? getEagleColor(c.textStrokeColor) : null),
-            strokeWidth: generatePropertyObjectFromComponent(falconComponent, "textStrokeSize", mediaLineItemCompoundKeys, null, (c) => c.textStrokeSize ?? null),
+            strokeFill: generatePropertyObjectFromComponent(falconComponent, "textStrokeColor", mediaLineItemCompoundKeys, "null", (c) => c.textStroke ? getEagleColor(c.textStrokeColor) : null),
+            strokeWidth: generatePropertyObjectFromComponent(falconComponent, "textStrokeSize", mediaLineItemCompoundKeys, "null", (c) => c.textStrokeSize ?? null),
             strokePosition: generatePropertyObject("inside", mediaLineItemCompoundKeys),
             highlightFill: generatePropertyObject(null),
             highlightLeftPadding: generatePropertyObject(0),
@@ -111,7 +123,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             highlightBottomPadding: generatePropertyObject(0),
             highlightBorderRadius: generatePropertyObject(0),
             appleFontTracking: generatePropertyObjectFromComponent(falconComponent, "useAppleFontTrackingValue", mediaLineItemCompoundKeys, false, (c) => c.useAppleFontTrackingValue ?? false),
-            fontBlobHash: generatePropertyObjectFromComponent(falconComponent, "platformFontBlobHash", mediaLineItemCompoundKeys, null, (c) => getPlatformFontBlobHash(c.fontLocalId, fonts, platformFonts)),
+            fontBlobHash: generatePropertyObjectFromComponent(falconComponent, "platformFontBlobHash", mediaLineItemCompoundKeys, DEFAULT_FONT_BLOB_HASH, (c) => getPlatformFontBlobHash(c.fontLocalId, fonts, platformFonts)),
         }
 
         eagleComponent.type = "Texty"
@@ -125,7 +137,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.textDirection = generatePropertyObject("auto")
         eagleComponent.attributes.horizontalAlignment = generatePropertyObjectFromComponent(falconComponent, "textAlign", mediaLineItemCompoundKeys, "left", (c) => getEagleTextAlign(c.textAlign))
         eagleComponent.attributes.verticalAlignment = generatePropertyObjectFromComponent(falconComponent, "textAlignVertical", mediaLineItemCompoundKeys, "top", (c) => getEagleVerticalTextAlign(c.textAlignVertical))
-        eagleComponent.attributes.content = generatePropertyObjectFromComponent(falconComponent, "text", mediaLineItemCompoundKeys, null, (c) => getEagleTextObjects(c.text, textyStyleId))
+        eagleComponent.attributes.content = generatePropertyObjectFromComponent(falconComponent, "text", mediaLineItemCompoundKeys, "null", (c) => getEagleTextObjects(c.text, textyStyleId))
         eagleComponent.styles = [
             {
                 id: textyStyleId,
@@ -230,6 +242,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
 function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
     const getGroupContentEagleComponents = function (objects, group, eagleParentId) {
         const groupContentEagleComponents = []
+        // TODO: fix - don't sort here, check if zIndex setting in the eagle component creation is fine for groups as well
         objects.sort((a, b) => b.zIndex - a.zIndex)
         objects.forEach(component => {
             // Add info about the parent
@@ -462,7 +475,6 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
                     mediaLineItemIndex,
                 })
             })
-            creativeComponents.sort((a, b) => b.zIndex - a.zIndex)
 
             // mimic backgroundColor as a Shapey component
             if (variant.backgroundColor) {
@@ -574,6 +586,7 @@ export async function generateZip (creatives, platformFonts) {
     const files = getFiles(eligibleCreatives)
     const fonts = getFonts(eligibleCreatives)
     const json = await generateJson(eligibleCreatives, fonts, files, platformFonts)
+    console.log(json)
     const zip = new JSZip()
     zip.file("designFile.json", JSON.stringify(json))
 

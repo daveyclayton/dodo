@@ -55,7 +55,8 @@ export async function fetchCreatives (designFileId) {
         }
 
         return responseJson
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(errorMessage)
     }
 }
@@ -66,7 +67,8 @@ export async function fetchFalconDesignFile (designFileId) {
     try {
         const response = await dispatch(`folders/${designFileId}?fields=id,name,accountId`)
         return await response.json()
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(errorMessage)
     }
 }
@@ -82,7 +84,8 @@ async function fetchAccount (accountId) {
         }
 
         return responseJson
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(errorMessage)
     }
 }
@@ -98,7 +101,8 @@ export async function fetchFonts (accountId) {
         }
 
         return responseJson
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(errorMessage)
     }
 }
@@ -106,7 +110,8 @@ export async function fetchFonts (accountId) {
 export async function fetchBlob (blobhash) {
     try {
         return await dispatch(`blobs/${blobhash}`, "GET", null, [], true)
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(`Failed to fetch the blob with hash '${blobhash}'. Please check the hash.`)
     }
 }
@@ -119,7 +124,8 @@ export async function createDesignFile (accountId, name, zip) {
         const response = await dispatch(`designFiles/upload?accountId=${accountId}&name=${name}`, "POST", zip, [["Content-Type", "application/zip"]])
         const responseJson = await response.json()
         return await getEagleDesignFileUrl(accountId, responseJson.id)
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(errorMessage)
     }
 
@@ -137,7 +143,8 @@ async function getEagleDesignFileUrl (accountId, eagleCampaignId) {
         }
         const designFileId = responseJson[0].id
         return `${account.clientUrl}projects/${designFileId}`
-    } catch {
+    } catch (error) {
+        console.error(error)
         throw new Error(errorMessage)
     }
 }
