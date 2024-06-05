@@ -1,4 +1,5 @@
 import { DEFAULT_FONT_BLOB_HASH } from "./constants.js"
+import { convertPercentToPx, generateId } from "./utils.js"
 
 export function getVariants (creative) {
     return creative.units.banner.variants ?? [creative.units.banner]
@@ -62,4 +63,122 @@ export function getFonts (creatives) {
     })
 
     return fonts
+}
+
+export function generateBackgroundShapeyComponent (variant, mediaLineItemIndex) {
+    return {
+        clazz: "Shapey",
+        name: "Background",
+        aspectRatioLocked: false,
+        layoutSpecificValues: [
+            {
+                size: {
+                    width: "100%",
+                    height: "100%",
+                },
+                position: {
+                    left: "0px",
+                    top: "0px",
+                },
+                rotation: 0,
+                opacity: 1,
+            },
+        ],
+        backgroundColor: variant.backgroundColor,
+        border: variant.borderSize > 0,
+        borderWidth: variant.borderSize,
+        borderColor: variant.borderColor,
+        parentSize: {
+            width: variant.layouts[0].designTimeSize.width,
+            height: variant.layouts[0].designTimeSize.height,
+        },
+        sceneDuration: getVariantDurationInSeconds(variant),
+        zIndex: -1,
+        mediaLineItemIndex,
+    }
+}
+
+export function partitionComponentsByParentId (componentsByNameAndClazz) {
+    const componentsWithoutParentId = []
+    const componentsWithParentId = []
+    Object.values(componentsByNameAndClazz).forEach(falconComponent => {
+        if (falconComponent.componentValues.some(v => v.parentId !== null)) {
+            componentsWithParentId.push(falconComponent)
+        } else {
+            componentsWithoutParentId.push(falconComponent)
+        }
+    })
+
+    return {
+        componentsWithoutParentId,
+        componentsWithParentId,
+    }
+}
+
+export function partitionFalconComponentsByNameAndClazz (components, parentId, falconComponentsByNameAndClazz) {
+    const addComponentToMap = (component, temporaryId) => {
+        const { clazz, name, ...properties } = component
+        const componentKey = `${clazz} - ${name}`
+
+        if (!falconComponentsByNameAndClazz[componentKey]) {
+            falconComponentsByNameAndClazz[componentKey] = {
+                clazz: clazz,
+                name: name,
+                id: temporaryId,
+                componentValues: [],
+            }
+        }
+        falconComponentsByNameAndClazz[componentKey].componentValues[component.mediaLineItemIndex.toString()] = {
+            ...properties,
+            parentId,
+        }
+    }
+
+    components.sort((a, b) => a.zIndex - b.zIndex)
+    components.forEach(component => {
+        const temporaryId = `falcon_${generateId()}`
+        if (component.clazz !== "ChoiceFeed") {
+            addComponentToMap(component, temporaryId)
+        }
+
+        if (component.clazz === "Group") {
+            const groupObjects = mapFalconComponentObjects(component, component.content.objects)
+            partitionFalconComponentsByNameAndClazz(groupObjects, temporaryId, falconComponentsByNameAndClazz)
+        } else if (component.clazz === "ChoiceFeed") {
+            component.content.forEach(choiceContent => {
+                // We need to remap some values from both the ChoiceFeed and the child NestedContainer component.
+                const layoutSpecificValues = [{
+                    ...choiceContent.layoutSpecificValues[0],
+                    ...component.layoutSpecificValues[0],
+                }]
+                choiceContent = {
+                    ...component,
+                    ...choiceContent,
+                    layoutSpecificValues,
+                }
+
+                const choiceContentComponentTemporaryId = `falcon_${generateId()}`
+                addComponentToMap(choiceContent, choiceContentComponentTemporaryId)
+                const choiceContentObjects = mapFalconComponentObjects(choiceContent, choiceContent.objects)
+
+                partitionFalconComponentsByNameAndClazz(choiceContentObjects, choiceContentComponentTemporaryId, falconComponentsByNameAndClazz)
+            })
+
+        }
+    })
+}
+
+function mapFalconComponentObjects (component, objects) {
+    return objects.map(object => {
+        const layoutSpecificValue = component.layoutSpecificValues[0]
+        return {
+            ...object,
+            mediaLineItemIndex: component.mediaLineItemIndex,
+            parentSize: {
+                width: convertPercentToPx(layoutSpecificValue.size.width, component.parentSize.width, false),
+                height: convertPercentToPx(layoutSpecificValue.size.height, component.parentSize.height, false),
+            },
+            sceneDuration: component.sceneDuration,
+        }
+    })
 }

@@ -34,7 +34,7 @@ export function convertPercentToPx (numberOrString, parentSizeInPx, allowFloat =
     }
 
     if (allowFloat) {
-        return number
+        return parseFloat(number.toFixed(2))
     } else {
         return Math.round(number)
     }

@@ -2,7 +2,16 @@
 import { fetchBlob } from "./celtraApi.js"
 import { generateNOrderIndexes } from "./fractionalIndexes.js"
 import { generateId, getInt, convertPercentToPx } from "./utils.js"
-import { getVariants, getPlatformFontBlobHash, getFiles, getFonts, getVariantDurationInSeconds, getObjects } from "./falconUtils.js"
+import {
+    getVariants,
+    getPlatformFontBlobHash,
+    getFiles,
+    getFonts,
+    getVariantDurationInSeconds,
+    getObjects,
+    partitionComponentsByParentId,
+    partitionFalconComponentsByNameAndClazz,
+} from "./falconUtils.js"
 import {
     getXYFromFalconPosition,
     getEagleColor,
@@ -26,9 +35,10 @@ import {
 
 let orderIndexIndex = 0
 let orderIndexes = []
+const falconToEagleIds = {}
 
 function generateOrderIndexes () {
-    orderIndexes = generateNOrderIndexes([], 5000)
+    orderIndexes = generateNOrderIndexes([], 7500)
 }
 
 function getEligibleCreatives (creatives) {
@@ -37,8 +47,10 @@ function getEligibleCreatives (creatives) {
 
 function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
     const compoundKeysWhereComponentIsPresent = mediaLineItemCompoundKeys.filter((key, index) => Object.keys(falconComponent.componentValues).some(i => i == index))
+    const componentId = generateId()
+    falconToEagleIds[falconComponent.id] = componentId
     const eagleComponent = {
-        id: generateId(),
+        id: componentId,
         name: falconComponent.name,
         animations: [],
         attributes: {
@@ -54,14 +66,28 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             resizingHeight: generatePropertyObject("fixed"),
             blur: generatePropertyObject(null),
             orderIndex: generatePropertyObjectFromComponent(falconComponent, "zIndex", mediaLineItemCompoundKeys, orderIndexes[orderIndexIndex++], (c) => {
+                if (c.zIndex === -1) {
+                    return orderIndexes.splice(orderIndexes.length - 1, 1)[0]
+                }
+
+                const maxOrderIndex = orderIndexes.length - 1 - 100 // leave 100 values for cases where zIndex is -1
+                const randomFromOneToHundred = Math.floor(Math.random() * 100) + 1
                 if (c.zIndex) {
-                    const orderIndexIndex = orderIndexes.length - 1 - c.zIndex
-                    return orderIndexes[orderIndexIndex]
+                    const zIndexFactor = c.zIndex * (c.mediaLineItemIndex + 1)
+                    let orderIndexIndex = orderIndexes.length - zIndexFactor
+                    if (orderIndexIndex < 0) {
+                        orderIndexIndex = randomFromOneToHundred
+                    }
+                    if (orderIndexIndex > maxOrderIndex) {
+                        orderIndexIndex = maxOrderIndex
+                    }
+                    return orderIndexes.splice(orderIndexIndex, 1)[0]
                 } else {
-                    return orderIndexes[orderIndexes.length - 1]
+                    const zIndexFactor = randomFromOneToHundred * (c.mediaLineItemIndex + 1)
+                    return orderIndexes.splice(maxOrderIndex - zIndexFactor, 1)[0]
                 }
             }),
-            parentId: generatePropertyObjectFromComponent(falconComponent, "parentId", mediaLineItemCompoundKeys, "null", (c) => c.parentId ?? null),
+            parentId: generatePropertyObjectFromComponent(falconComponent, "parentId", mediaLineItemCompoundKeys, "null", (c) => falconToEagleIds[c.parentId] ?? null),
         },
     }
 
@@ -183,7 +209,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
                 blobHash: file?.blobHash,
             }
         }
-        eagleComponent.attributes.image = generatePropertyObjectFromComponent(falconComponent, "fileLocalId", mediaLineItemCompoundKeys, null, pictureFileExtractor)
+        eagleComponent.attributes.image = generatePropertyObjectFromComponent(falconComponent, "fileLocalId", mediaLineItemCompoundKeys, "null", pictureFileExtractor)
         break
     case "VideoAsset":
         eagleComponent.type = "Video"
@@ -205,7 +231,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
                 blobHash: file?.blobHash,
             }
         }
-        eagleComponent.attributes.video = generatePropertyObjectFromComponent(falconComponent, "videoLocalId", mediaLineItemCompoundKeys, null, videoFileExtractor)
+        eagleComponent.attributes.video = generatePropertyObjectFromComponent(falconComponent, "videoLocalId", mediaLineItemCompoundKeys, "null", videoFileExtractor)
 
         // Video needs a component clip animation for valid schema
         const animatableMediaLineItemCompoundKeys = getAnimatableMediaLineItemCompoundKeys(mediaLineItemCompoundKeys)
@@ -237,59 +263,6 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     }
 
     return eagleComponent
-}
-
-function getEagleComponentsFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
-    const getGroupContentEagleComponents = function (objects, group, eagleParentId) {
-        const groupContentEagleComponents = []
-        // TODO: fix - don't sort here, check if zIndex setting in the eagle component creation is fine for groups as well
-        objects.sort((a, b) => b.zIndex - a.zIndex)
-        objects.forEach(component => {
-            // Add info about the parent
-            const layoutSpecificValue = group.layoutSpecificValues[0]
-            const falconComponentWithParentInfo = {
-                ...component,
-                mediaLineItemIndex: group.mediaLineItemIndex,
-                parentSize: {
-                    width: convertPercentToPx(layoutSpecificValue.size.width, group.parentSize.width, false),
-                    height: convertPercentToPx(layoutSpecificValue.size.height, group.parentSize.height, false),
-                },
-                sceneDuration: group.sceneDuration,
-                parentId: eagleParentId,
-            }
-            groupContentEagleComponents.push(...getEagleComponentsFromFalconComponent(falconComponentWithParentInfo, files, fonts, platformFonts, mediaLineItemCompoundKeys))
-        })
-
-        return groupContentEagleComponents
-    }
-
-    const eagleComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
-    let eagleComponents = [eagleComponent]
-    if (falconComponent.clazz === "Group") {
-        // TODO: fix
-        eagleComponents.push(...getGroupContentEagleComponents(falconComponent.content.objects, falconComponent, eagleComponent.id))
-    } else if (falconComponent.clazz === "ChoiceFeed") {
-        // Transform every choice outcome into a group.
-        // We don't need the initial component that was created since we have to transfer all outcomes as separate groups.
-        eagleComponents = []
-        falconComponent.content.forEach(choiceContent => {
-            // We need to remap some values from both the ChoiceFeed and the child NestedContainer component.
-            const layoutSpecificValues = [{
-                ...choiceContent.layoutSpecificValues[0],
-                ...falconComponent.layoutSpecificValues[0],
-            }]
-            choiceContent = {
-                ...falconComponent,
-                ...choiceContent,
-                layoutSpecificValues,
-            }
-            const eagleGroupComponent = getEagleComponentFromFalconComponent(choiceContent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
-            eagleComponents.push(eagleGroupComponent)
-            eagleComponents.push(...getGroupContentEagleComponents(choiceContent.objects, falconComponent, eagleGroupComponent.id))
-        })
-    }
-
-    return eagleComponents
 }
 
 function getFurniture (format, creative) {
@@ -505,6 +478,7 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
                         height: variant.layouts[0].designTimeSize.height,
                     },
                     sceneDuration: getVariantDurationInSeconds(variant),
+                    zIndex: -1,
                     mediaLineItemIndex,
                 })
             }
@@ -514,28 +488,17 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
         })
     })
 
-    console.log(falconComponents)
+    // This function should be extracted, it's a mess right now.
     const falconComponentsByNameAndClazz = {}
-    falconComponents.forEach(component => {
-        const { clazz, name, parentId, ...properties } = component
-        const key = `${clazz} - ${component.name}`
-        if (!falconComponentsByNameAndClazz[key]) {
-            falconComponentsByNameAndClazz[key] = {
-                clazz: clazz,
-                name: name,
-                parentId: parentId,
-                componentValues: [],
-            }
-        }
-        falconComponentsByNameAndClazz[key].componentValues[component.mediaLineItemIndex.toString()] = properties
-    })
-    console.log(falconComponentsByNameAndClazz)
+    partitionFalconComponentsByNameAndClazz(falconComponents, null, falconComponentsByNameAndClazz)
 
     const canvasComponents = []
-    Object.values(falconComponentsByNameAndClazz).forEach(falconComponent => {
-        const eagleCanvasComponents = getEagleComponentsFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
-        const eligibleComponents = eagleCanvasComponents.filter(c => !!c)
-        canvasComponents.push(...eligibleComponents)
+    const { componentsWithoutParentId, componentsWithParentId } = partitionComponentsByParentId(falconComponentsByNameAndClazz)
+    componentsWithoutParentId.concat(componentsWithParentId).forEach(falconComponent => {
+        const eagleCanvasComponent = getEagleComponentFromFalconComponent(falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+        if (eagleCanvasComponent) {
+            canvasComponents.push(eagleCanvasComponent)
+        }
     })
 
     return canvasComponents
@@ -586,7 +549,6 @@ export async function generateZip (creatives, platformFonts) {
     const files = getFiles(eligibleCreatives)
     const fonts = getFonts(eligibleCreatives)
     const json = await generateJson(eligibleCreatives, fonts, files, platformFonts)
-    console.log(json)
     const zip = new JSZip()
     zip.file("designFile.json", JSON.stringify(json))
 
