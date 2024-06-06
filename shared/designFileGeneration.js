@@ -66,6 +66,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             resizingHeight: generatePropertyObject("fixed"),
             blur: generatePropertyObject(null),
             orderIndex: generatePropertyObjectFromComponent(falconComponent, "zIndex", mediaLineItemCompoundKeys, orderIndexes[orderIndexIndex++], (c) => {
+                // TODO: simplify, this is a mess now :/
                 if (c.zIndex === -1) {
                     return orderIndexes.splice(orderIndexes.length - 1, 1)[0]
                 }
