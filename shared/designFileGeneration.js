@@ -45,12 +45,10 @@ function getEligibleCreatives (creatives) {
     return creatives.filter(creative => SUPPORTED_FORMATS.includes(creative.clazz))
 }
 
-function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
+function getBaseEagleComponentProperties (falconComponent, mediaLineItemCompoundKeys) {
     const compoundKeysWhereComponentIsPresent = mediaLineItemCompoundKeys.filter((key, index) => Object.keys(falconComponent.componentValues).some(i => i == index))
-    const componentId = generateId()
-    falconToEagleIds[falconComponent.id] = componentId
     const eagleComponent = {
-        id: componentId,
+        id: generateId(),
         name: falconComponent.name,
         animations: [],
         attributes: {
@@ -122,6 +120,13 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
     eagleComponent.attributes.shadowY = generatePropertyObjectFromComponent(falconComponent, "shadowDistance", mediaLineItemCompoundKeys, 0, (c) => c.shadow ? c.shadowDistance : 0)
     eagleComponent.attributes.shadowColor = generatePropertyObjectFromComponent(falconComponent, "shadowColor", mediaLineItemCompoundKeys, null, (c) => c.shadow ? c.shadowColor : null)
     eagleComponent.attributes.shadowBlur = generatePropertyObjectFromComponent(falconComponent, "shadowBlur", mediaLineItemCompoundKeys, 4, (c) => c.shadow ? c.shadowBlur : 4)
+
+    return eagleComponent
+}
+
+function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
+    const eagleComponent = getBaseEagleComponentProperties(falconComponent, mediaLineItemCompoundKeys)
+    falconToEagleIds[falconComponent.id] = eagleComponent.id
 
     if (COMPONENTS_WITH_STROKE.includes(falconComponent.clazz)) {
         eagleComponent.attributes.strokeRadius = generatePropertyObjectFromComponent(falconComponent, "roundness", mediaLineItemCompoundKeys, 0, (c) => c.roundness ?? 0)
