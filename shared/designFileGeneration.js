@@ -36,6 +36,7 @@ import {
 let orderIndexIndex = 0
 let orderIndexes = []
 const falconToEagleIds = {}
+const falconToFalconIds = {} // We use this when we merge components together so references can be updated.
 
 function generateOrderIndexes () {
     orderIndexes = generateNOrderIndexes([], 7500)
@@ -45,7 +46,7 @@ function getEligibleCreatives (creatives) {
     return creatives.filter(creative => SUPPORTED_FORMATS.includes(creative.clazz))
 }
 
-function getBaseEagleComponentProperties (falconComponent, mediaLineItemCompoundKeys) {
+function getBaseEagleComponent (falconComponent, mediaLineItemCompoundKeys) {
     const compoundKeysWhereComponentIsPresent = mediaLineItemCompoundKeys.filter((key, index) => Object.keys(falconComponent.componentValues).some(i => i == index))
     const eagleComponent = {
         id: generateId(),
@@ -86,7 +87,13 @@ function getBaseEagleComponentProperties (falconComponent, mediaLineItemCompound
                     return orderIndexes.splice(maxOrderIndex - zIndexFactor, 1)[0]
                 }
             }),
-            parentId: generatePropertyObjectFromComponent(falconComponent, "parentId", mediaLineItemCompoundKeys, "null", (c) => falconToEagleIds[c.parentId] ?? null),
+            parentId: generatePropertyObjectFromComponent(falconComponent, "parentId", mediaLineItemCompoundKeys, "null", (c) => {
+                if (!c.parentId) {
+                    return null
+                }
+                const falconId = falconToFalconIds[c.parentId] ?? c.parentId
+                return falconToEagleIds[falconId] ?? null
+            }),
         },
     }
 
@@ -125,7 +132,7 @@ function getBaseEagleComponentProperties (falconComponent, mediaLineItemCompound
 }
 
 function getEagleComponentFromFalconComponent (falconComponent, files, fonts, platformFonts, mediaLineItemCompoundKeys) {
-    const eagleComponent = getBaseEagleComponentProperties(falconComponent, mediaLineItemCompoundKeys)
+    const eagleComponent = getBaseEagleComponent(falconComponent, mediaLineItemCompoundKeys)
     falconToEagleIds[falconComponent.id] = eagleComponent.id
 
     if (COMPONENTS_WITH_STROKE.includes(falconComponent.clazz)) {
@@ -494,9 +501,10 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
         })
     })
 
-    // This function should be extracted, it's a mess right now.
     const falconComponentsByNameAndClazz = {}
-    partitionFalconComponentsByNameAndClazz(falconComponents, null, falconComponentsByNameAndClazz)
+    partitionFalconComponentsByNameAndClazz(falconComponents, null, falconComponentsByNameAndClazz, falconToFalconIds)
+
+    console.log(falconComponentsByNameAndClazz)
 
     const canvasComponents = []
     const { componentsWithoutParentId, componentsWithParentId } = partitionComponentsByParentId(falconComponentsByNameAndClazz)
@@ -507,10 +515,12 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
         }
     })
 
+    console.log(canvasComponents)
+
     return canvasComponents
 }
 
-export async function generateJson (creatives, fonts, files, platformFonts) {
+async function generateJson (creatives, fonts, files, platformFonts) {
     generateOrderIndexes()
     const { mediaLineItems, mediaLineItemCompoundKeys } = getMediaLineItems(creatives)
     const canvasComponents = getCanvasComponents(creatives, files, fonts, platformFonts, mediaLineItemCompoundKeys)

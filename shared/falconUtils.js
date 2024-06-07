@@ -115,7 +115,7 @@ export function partitionComponentsByParentId (componentsByNameAndClazz) {
     }
 }
 
-export function partitionFalconComponentsByNameAndClazz (components, parentId, falconComponentsByNameAndClazz) {
+export function partitionFalconComponentsByNameAndClazz (components, parentId, falconComponentsByNameAndClazz, falconToFalconIds) {
     const addComponentToMap = (component, temporaryId) => {
         const { clazz, name, ...properties } = component
         const componentKey = `${clazz} - ${name}`
@@ -137,7 +137,6 @@ export function partitionFalconComponentsByNameAndClazz (components, parentId, f
          */
         const componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex = !!falconComponentsByNameAndClazz[componentKey].componentValues[mediaLineItemIndexString]
         if (componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex) {
-            debugger
             const newComponentKey = `${componentKey}_${generateId()}`
             falconComponentsByNameAndClazz[newComponentKey] = {
                 clazz: clazz,
@@ -166,7 +165,7 @@ export function partitionFalconComponentsByNameAndClazz (components, parentId, f
 
         if (component.clazz === "Group") {
             const groupObjects = mapFalconComponentObjects(component, component.content.objects)
-            partitionFalconComponentsByNameAndClazz(groupObjects, temporaryId, falconComponentsByNameAndClazz)
+            partitionFalconComponentsByNameAndClazz(groupObjects, temporaryId, falconComponentsByNameAndClazz, falconToFalconIds)
         } else if (component.clazz === "ChoiceFeed") {
             component.content.forEach(choiceContent => {
                 // We need to remap some values from both the ChoiceFeed and the child NestedContainer component.
@@ -184,7 +183,7 @@ export function partitionFalconComponentsByNameAndClazz (components, parentId, f
                 addComponentToMap(choiceContent, choiceContentComponentTemporaryId)
                 const choiceContentObjects = mapFalconComponentObjects(choiceContent, choiceContent.objects)
 
-                partitionFalconComponentsByNameAndClazz(choiceContentObjects, choiceContentComponentTemporaryId, falconComponentsByNameAndClazz)
+                partitionFalconComponentsByNameAndClazz(choiceContentObjects, choiceContentComponentTemporaryId, falconComponentsByNameAndClazz, falconToFalconIds)
             })
 
         }
