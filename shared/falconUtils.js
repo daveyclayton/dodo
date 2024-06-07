@@ -116,11 +116,27 @@ export function partitionComponentsByParentId (componentsByNameAndClazz) {
 }
 
 export function partitionFalconComponentsByNameAndClazz (components, parentId, falconComponentsByNameAndClazz, falconToFalconIds) {
+    const findNextAvailableComponentKey = (componentKey, mediaLineItemString) => {
+        const getComponentKeyWithIndex = (componentKey, index) => {
+            return `${componentKey}_(${index})`
+        }
+
+        let index = 1
+        let nextAvailableComponentKey = getComponentKeyWithIndex(componentKey, index)
+        while (falconComponentsByNameAndClazz[nextAvailableComponentKey]?.componentValues[mediaLineItemString]) {
+            index++
+            nextAvailableComponentKey = getComponentKeyWithIndex(componentKey, index)
+        }
+        return nextAvailableComponentKey
+    }
+
     const addComponentToMap = (component, temporaryId) => {
         const { clazz, name, ...properties } = component
         const componentKey = `${clazz} - ${name}`
 
-        if (!falconComponentsByNameAndClazz[componentKey]) {
+        if (falconComponentsByNameAndClazz[componentKey]) {
+            falconToFalconIds[temporaryId] = falconComponentsByNameAndClazz[componentKey].id
+        } else {
             falconComponentsByNameAndClazz[componentKey] = {
                 clazz: clazz,
                 name: name,
@@ -137,7 +153,7 @@ export function partitionFalconComponentsByNameAndClazz (components, parentId, f
          */
         const componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex = !!falconComponentsByNameAndClazz[componentKey].componentValues[mediaLineItemIndexString]
         if (componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex) {
-            const newComponentKey = `${componentKey}_${generateId()}`
+            const newComponentKey = findNextAvailableComponentKey(componentKey, mediaLineItemIndexString)
             falconComponentsByNameAndClazz[newComponentKey] = {
                 clazz: clazz,
                 name: name,
