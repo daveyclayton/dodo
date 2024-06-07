@@ -128,9 +128,32 @@ export function partitionFalconComponentsByNameAndClazz (components, parentId, f
                 componentValues: [],
             }
         }
-        falconComponentsByNameAndClazz[componentKey].componentValues[component.mediaLineItemIndex.toString()] = {
-            ...properties,
-            parentId,
+
+        const mediaLineItemIndexString = component.mediaLineItemIndex.toString()
+        /**
+         * It can happen that a component with same name and clazz exists on the same mediaLineItemIndex.
+         * Falcon supported having multiple components with the same name and clazz on the same mediaLineItemIndex and this just linked the content.
+         * Until we support content linking in eagle we have to migrate this to separate components.
+         */
+        const componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex = !!falconComponentsByNameAndClazz[componentKey].componentValues[mediaLineItemIndexString]
+        if (componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex) {
+            debugger
+            const newComponentKey = `${componentKey}_${generateId()}`
+            falconComponentsByNameAndClazz[newComponentKey] = {
+                clazz: clazz,
+                name: name,
+                id: temporaryId,
+                componentValues: [],
+            }
+            falconComponentsByNameAndClazz[newComponentKey].componentValues[mediaLineItemIndexString] = {
+                ...properties,
+                parentId,
+            }
+        } else {
+            falconComponentsByNameAndClazz[componentKey].componentValues[mediaLineItemIndexString] = {
+                ...properties,
+                parentId,
+            }
         }
     }
 

@@ -29,6 +29,7 @@ export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], d
     return propertyObject
 }
 
+// TODO: remove propertyName
 export function generatePropertyObjectFromComponent (falconComponent, propertyName, mediaLineItemCompoundKeys = [], defaultValue = null, extractorFunction = null) {
     let mappedDefaultValue = defaultValue ?? falconComponent.componentValues[Object.keys(falconComponent.componentValues)[0]][propertyName] ?? null
     if (mappedDefaultValue === "null") {
@@ -41,7 +42,7 @@ export function generatePropertyObjectFromComponent (falconComponent, propertyNa
         if (valuesForIndexExist) {
             let propertyValue = falconComponent.componentValues[index][propertyName] ?? mappedDefaultValue
             if (extractorFunction) {
-                propertyValue = extractorFunction(falconComponent.componentValues[index])
+                propertyValue = extractorFunction(falconComponent.componentValues[index], key)
             }
             propertyObject.values[key] = propertyValue
         }

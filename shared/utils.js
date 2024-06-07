@@ -51,8 +51,17 @@ export async function getCredentials () {
     return credentials
 }
 
+async function getManifestJson () {
+    const manifestResponse = await fetch("../manifest.json")
+    return await manifestResponse.json()
+}
+
+export async function getVersion () {
+    const manifestJson = await getManifestJson()
+    return manifestJson.version
+}
+
 export async function logExtensionInfo () {
-    const packageResponse = await fetch("../package.json")
-    const packageJson = await packageResponse.json()
-    console.log(packageJson.name, packageJson.version)
+    const manifestJson = await getManifestJson()
+    console.log(manifestJson.name, manifestJson.version)
 }

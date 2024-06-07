@@ -247,7 +247,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
             attributes: {
                 presence: generatePropertyObject(true, animatableMediaLineItemCompoundKeys, false),
                 delay: generatePropertyObject(0, animatableMediaLineItemCompoundKeys),
-                duration: generatePropertyObject(falconComponent.sceneDuration, animatableMediaLineItemCompoundKeys),
+                duration: generatePropertyObjectFromComponent(falconComponent, "sceneDuration", animatableMediaLineItemCompoundKeys, 6000, (c) => c.sceneDuration),
             },
         })
         break
