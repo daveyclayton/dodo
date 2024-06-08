@@ -504,8 +504,6 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
     const falconComponentsByNameAndClazz = {}
     partitionFalconComponentsByNameAndClazz(falconComponents, null, falconComponentsByNameAndClazz, falconToFalconIds)
 
-    console.log(falconComponentsByNameAndClazz)
-
     const canvasComponents = []
     const { componentsWithoutParentId, componentsWithParentId } = partitionComponentsByParentId(falconComponentsByNameAndClazz)
     componentsWithoutParentId.concat(componentsWithParentId).forEach(falconComponent => {
@@ -514,8 +512,6 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
             canvasComponents.push(eagleCanvasComponent)
         }
     })
-
-    console.log(canvasComponents)
 
     return canvasComponents
 }

@@ -154,11 +154,13 @@ export function partitionFalconComponentsByNameAndClazz (components, parentId, f
         const componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex = !!falconComponentsByNameAndClazz[componentKey].componentValues[mediaLineItemIndexString]
         if (componentWithSameNameAndClazzExistsOnSameMediaLineItemIndex) {
             const newComponentKey = findNextAvailableComponentKey(componentKey, mediaLineItemIndexString)
-            falconComponentsByNameAndClazz[newComponentKey] = {
-                clazz: clazz,
-                name: name,
-                id: temporaryId,
-                componentValues: [],
+            if (!falconComponentsByNameAndClazz[newComponentKey]) {
+                falconComponentsByNameAndClazz[newComponentKey] = {
+                    clazz: clazz,
+                    name: name,
+                    id: temporaryId,
+                    componentValues: [],
+                }
             }
             falconComponentsByNameAndClazz[newComponentKey].componentValues[mediaLineItemIndexString] = {
                 ...properties,
