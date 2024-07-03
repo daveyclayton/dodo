@@ -18,10 +18,13 @@ export function getObjects (variant) {
 }
 
 export function getVariantDurationInSeconds (variant) {
-    if (variant.master.scenes.length === 0) {
-        return 6000 // return some default duration if we have no scenes
+    if (variant.master && variant.master.duration) {
+        return variant.master.duration
     }
-    return variant.master.scenes[0].duration * 1000
+    if (variant.master.scenes && variant.master.scenes.length > 0) {
+        return variant.master.scenes[0].duration * 1000
+    }
+    return 6000 // return some default duration if we can't find the scenes
 }
 
 export function getPlatformFontBlobHash (fontLocalId, fonts, platformFonts) {
