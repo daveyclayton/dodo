@@ -6,7 +6,7 @@ import {
 } from "../shared/celtraApi.js"
 import { generateZip } from "../shared/designFileGeneration.js"
 import { getSync } from "../shared/storage.js"
-import { getCredentials, getVersion, logExtensionInfo } from "../shared/utils.js"
+import { getCredentials, getExtensionInfo, logExtensionInfo } from "../shared/utils.js"
 
 const designFileInput = document.getElementById("design-file-id")
 const accountInput = document.getElementById("account-id")
@@ -19,8 +19,8 @@ function init () {
 }
 
 async function printVersion () {
-    const version = await getVersion()
-    document.getElementById("version").innerHTML = `v${version}`
+    const extensionInfo = await getExtensionInfo()
+    document.getElementById("version").innerHTML = `v${extensionInfo.version}`
     logExtensionInfo()
 }
 

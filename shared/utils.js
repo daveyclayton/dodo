@@ -56,12 +56,15 @@ async function getManifestJson () {
     return await manifestResponse.json()
 }
 
-export async function getVersion () {
+export async function getExtensionInfo () {
     const manifestJson = await getManifestJson()
-    return manifestJson.version
+    return {
+        version: manifestJson.version,
+        name: manifestJson.name,
+    }
 }
 
 export async function logExtensionInfo () {
-    const manifestJson = await getManifestJson()
-    console.log(manifestJson.name, manifestJson.version)
+    const extensionInfo = await getExtensionInfo()
+    console.log(extensionInfo.name, extensionInfo.version)
 }

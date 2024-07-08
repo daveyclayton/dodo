@@ -1,4 +1,4 @@
-import { getCredentials } from "./utils.js"
+import { getCredentials, getExtensionInfo } from "./utils.js"
 
 const PLATFORM_DOMAIN = "celtra.io"
 const API_URL = `https://hub.${PLATFORM_DOMAIN}/api/`
@@ -7,7 +7,10 @@ const API_PROXY_URL = "https://request-passthrough-afb95a0643d0.herokuapp.com/ap
 // const API_PROXY_URL = "https://hub.matic.test/api/" // FOR TESTING
 
 export async function dispatch (path, method = "GET", body = undefined, headers = [], cached = false) {
-    const requestHeaders = new Headers()
+    const extensionInfo = await getExtensionInfo()
+    const requestHeaders = new Headers({
+        "User-Agent": `${extensionInfo.name} v${extensionInfo.version}`,
+    })
     headers.forEach(header => requestHeaders.append(header[0], header[1]))
 
     let baseUrl = API_URL
