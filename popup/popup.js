@@ -82,6 +82,7 @@ function showDone (destinationUrl, warnings) {
 async function migrate () {
     const designFileId = designFileInput.value
     const accountId = accountInput.value
+    const isManualScaling = document.getElementById("manual-scaling").checked
 
     const isIdValid = (id) => {
         return id && typeof id === "string" && (id.length === 8 || id.length === 12)
@@ -97,7 +98,7 @@ async function migrate () {
         const creatives = await fetchCreatives(designFileId)
         const falconDesignFile = await fetchFalconDesignFile(designFileId)
         const platformFonts = await fetchFonts(falconDesignFile.accountId)
-        const { zip, warnings } = await generateZip(creatives, platformFonts)
+        const { zip, warnings } = await generateZip(creatives, platformFonts, isManualScaling)
         const designFileName = `[MIGRATED] ${falconDesignFile.name}`
         const newDesignFileUrl = await createDesignFile(accountId, designFileName, zip)
         showDone(newDesignFileUrl, warnings)

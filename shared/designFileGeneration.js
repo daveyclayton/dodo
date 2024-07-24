@@ -516,20 +516,37 @@ function getCanvasComponents (creatives, files, fonts, platformFonts, mediaLineI
     return canvasComponents
 }
 
-async function generateJson (creatives, fonts, files, platformFonts) {
+async function generateJson (creatives, fonts, files, platformFonts, isManualScaling = true) {
     generateOrderIndexes()
     const { mediaLineItems, mediaLineItemCompoundKeys } = getMediaLineItems(creatives)
     const canvasComponents = getCanvasComponents(creatives, files, fonts, platformFonts, mediaLineItemCompoundKeys)
+    const contentScalingDimensions = []
+    if (isManualScaling) {
+        contentScalingDimensions.push({
+            id: generateId(),
+            type: "custom",
+            name: "Rows",
+            values: [
+                {
+                    id: generateId(),
+                    name: "Row 1",
+                    attributes: {},
+                },
+            ],
+            attributes: [],
+        })
+    }
+
     return {
         version: DESIGN_FILE_VERSION,
         contentScaling: "manual",
-        outputScaling: "automatic",
+        outputScaling: isManualScaling ? "manual" : "automatic",
         isDesignLocked: false,
         mediaLineItemAttributes: [],
         customProductCatalogColumns: [],
         externalValues: [],
         threadContexts: [],
-        contentScalingDimensions: [],
+        contentScalingDimensions: contentScalingDimensions,
         customLayoutScalingDimensions: [],
         excludedCombinationTables: [],
         activations: [],
@@ -548,7 +565,7 @@ async function generateJson (creatives, fonts, files, platformFonts) {
     }
 }
 
-export async function generateZip (creatives, platformFonts) {
+export async function generateZip (creatives, platformFonts, isManualScaling = true) {
     const warnings = []
     const eligibleCreatives = getEligibleCreatives(creatives)
     if (eligibleCreatives.length === 0) {
@@ -560,7 +577,7 @@ export async function generateZip (creatives, platformFonts) {
 
     const files = getFiles(eligibleCreatives)
     const fonts = getFonts(eligibleCreatives)
-    const json = await generateJson(eligibleCreatives, fonts, files, platformFonts)
+    const json = await generateJson(eligibleCreatives, fonts, files, platformFonts, isManualScaling)
     const zip = new JSZip()
     zip.file("designFile.json", JSON.stringify(json))
 
