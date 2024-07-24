@@ -8,9 +8,8 @@ const API_PROXY_URL = "https://request-passthrough-afb95a0643d0.herokuapp.com/ap
 
 export async function dispatch (path, method = "GET", body = undefined, headers = [], cached = false) {
     const extensionInfo = await getExtensionInfo()
-    const requestHeaders = new Headers({
-        "User-Agent": `${extensionInfo.name} v${extensionInfo.version}`,
-    })
+    const requestHeaders = new Headers()
+    requestHeaders.append("User-Agent", `${extensionInfo.name} v${extensionInfo.version}`)
     headers.forEach(header => requestHeaders.append(header[0], header[1]))
 
     let baseUrl = API_URL
