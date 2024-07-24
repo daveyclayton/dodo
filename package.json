@@ -1,6 +1,6 @@
 {
   "name": "birdsOfPrey",
-  "version": "1.1.4",
+  "version": "2.0.0",
   "description": "Morphing Falcons into Eagles. Celtra CA v1 to v2 migration extension.",
   "main": "index.js",
   "scripts": {

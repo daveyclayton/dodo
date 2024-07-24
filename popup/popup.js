@@ -6,10 +6,23 @@ import {
 } from "../shared/celtraApi.js"
 import { generateZip } from "../shared/designFileGeneration.js"
 import { getSync } from "../shared/storage.js"
-import { getCredentials, logExtensionInfo } from "../shared/utils.js"
+import { getCredentials, getExtensionInfo, logExtensionInfo } from "../shared/utils.js"
 
 const designFileInput = document.getElementById("design-file-id")
 const accountInput = document.getElementById("account-id")
+
+function init () {
+    printVersion()
+    getCredentials()
+    loadDefaults()
+    showEnterData()
+}
+
+async function printVersion () {
+    const extensionInfo = await getExtensionInfo()
+    document.getElementById("version").innerHTML = `v${extensionInfo.version}`
+    logExtensionInfo()
+}
 
 function loadDefaults () {
     getSync("defaults").then(defaults => {
@@ -100,11 +113,8 @@ function onKeyDown (event) {
     }
 }
 
-getCredentials()
-loadDefaults()
-showEnterData()
+init()
 
 designFileInput.addEventListener("keypress", onKeyDown)
 accountInput.addEventListener("keypress", onKeyDown)
 document.getElementById("submit").addEventListener("click", migrate)
-logExtensionInfo()

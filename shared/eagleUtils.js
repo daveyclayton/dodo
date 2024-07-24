@@ -1,25 +1,51 @@
 import { getFloat, convertPercentToPx } from "./utils.js"
 
+function getInitialPropertyObject (dependsOn, defaultValue) {
+    return {
+        markedForScaling: false,
+        dependsOn: dependsOn,
+        values: {
+            default: defaultValue,
+        },
+    }
+
+}
+
 export function generatePropertyObject (value, mediaLineItemCompoundKeys = [], defaultValue = null, dependsOn = "canvas") {
-    let mappedDefaultValue = defaultValue ?? value
+    let mappedDefaultValue = defaultValue ?? value ?? null
     if (mappedDefaultValue === "null") {
         mappedDefaultValue = null
     }
 
-    const propertyObject = {
-        markedForScaling: false,
-        dependsOn: dependsOn,
-        values: {
-            default: mappedDefaultValue,
-        },
-    }
-
+    const propertyObject = getInitialPropertyObject(dependsOn, mappedDefaultValue)
     if (dependsOn === "content") {
         propertyObject.dimensions = []
     }
 
     mediaLineItemCompoundKeys.forEach(key => {
         propertyObject.values[key] = value
+    })
+
+    return propertyObject
+}
+
+// TODO: remove propertyName
+export function generatePropertyObjectFromComponent (falconComponent, propertyName, mediaLineItemCompoundKeys = [], defaultValue = null, extractorFunction = null) {
+    let mappedDefaultValue = defaultValue ?? falconComponent.componentValues[Object.keys(falconComponent.componentValues)[0]][propertyName] ?? null
+    if (mappedDefaultValue === "null") {
+        mappedDefaultValue = null
+    }
+
+    const propertyObject = getInitialPropertyObject("canvas", mappedDefaultValue)
+    mediaLineItemCompoundKeys.forEach((key, index) => {
+        const valuesForIndexExist = !!falconComponent.componentValues[index]
+        if (valuesForIndexExist) {
+            let propertyValue = falconComponent.componentValues[index][propertyName] ?? mappedDefaultValue
+            if (extractorFunction) {
+                propertyValue = extractorFunction(falconComponent.componentValues[index], key)
+            }
+            propertyObject.values[key] = propertyValue
+        }
     })
 
     return propertyObject

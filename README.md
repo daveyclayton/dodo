@@ -5,7 +5,6 @@ Falcon to Eagle Design File migration extension with quite some known limitation
 ![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
 
 # TODO
-    - components of the same name and clazz should be the same component in eagle
     - special control characters (no break, etc.) don't transfer okay
     - proper handling of choice components (once they are supported in Eagle)
     - anchoring?

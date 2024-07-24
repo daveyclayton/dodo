@@ -15,6 +15,13 @@ body {
     padding: 8px;
 }
 
+.version {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    font-size: 10px;
+}
+
 #loaded {
     display: none;
     text-align: center;

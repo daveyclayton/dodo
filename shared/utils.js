@@ -34,7 +34,7 @@ export function convertPercentToPx (numberOrString, parentSizeInPx, allowFloat =
     }
 
     if (allowFloat) {
-        return number
+        return parseFloat(number.toFixed(2))
     } else {
         return Math.round(number)
     }
@@ -51,8 +51,20 @@ export async function getCredentials () {
     return credentials
 }
 
+async function getManifestJson () {
+    const manifestResponse = await fetch("../manifest.json")
+    return await manifestResponse.json()
+}
+
+export async function getExtensionInfo () {
+    const manifestJson = await getManifestJson()
+    return {
+        version: manifestJson.version,
+        name: manifestJson.name,
+    }
+}
+
 export async function logExtensionInfo () {
-    const packageResponse = await fetch("../package.json")
-    const packageJson = await packageResponse.json()
-    console.log(packageJson.name, packageJson.version)
+    const extensionInfo = await getExtensionInfo()
+    console.log(extensionInfo.name, extensionInfo.version)
 }
