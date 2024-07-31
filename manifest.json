@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "BirdsOfPrey v2",
     "description": "Morphing Falcons into Eagles. Celtra CA v1 to v2 migration extension.",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "action": {
         "default_popup": "popup/popup.html",
         "default_icon": "assets/icon128.png"
