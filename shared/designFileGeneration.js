@@ -176,7 +176,7 @@ function getEagleComponentFromFalconComponent (falconComponent, files, fonts, pl
         eagleComponent.attributes.textDirection = generatePropertyObject("auto")
         eagleComponent.attributes.horizontalAlignment = generatePropertyObjectFromComponent(falconComponent, "textAlign", mediaLineItemCompoundKeys, "left", (c) => getEagleTextAlign(c.textAlign))
         eagleComponent.attributes.verticalAlignment = generatePropertyObjectFromComponent(falconComponent, "textAlignVertical", mediaLineItemCompoundKeys, "top", (c) => getEagleVerticalTextAlign(c.textAlignVertical))
-        eagleComponent.attributes.content = generatePropertyObjectFromComponent(falconComponent, "text", mediaLineItemCompoundKeys, "null", (c) => getEagleTextObjects(c.text, textyStyleId))
+        eagleComponent.attributes.content = generatePropertyObjectFromComponent(falconComponent, "text", mediaLineItemCompoundKeys, getEagleTextObjects("", textyStyleId), (c) => getEagleTextObjects(c.text, textyStyleId))
         eagleComponent.styles = [
             {
                 id: textyStyleId,
