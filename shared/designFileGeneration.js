@@ -566,6 +566,7 @@ async function generateJson (creatives, fonts, files, platformFonts, isManualSca
 }
 
 export async function generateZip (creatives, platformFonts, isManualScaling = true) {
+    
     const warnings = []
     const eligibleCreatives = getEligibleCreatives(creatives)
     if (eligibleCreatives.length === 0) {

@@ -80,10 +80,10 @@ function showDone (destinationUrl, warnings) {
 }
 
 async function migrate () {
-    const designFileId = designFileInput.value
+    const designFileId = JSON.parse(designFileInput.value)
     const accountId = accountInput.value
     const isManualScaling = document.getElementById("manual-scaling").checked
-
+    /*
     const isIdValid = (id) => {
         return id && typeof id === "string" && (id.length === 8 || id.length === 12)
     }
@@ -92,7 +92,7 @@ async function migrate () {
         showError("Account and Design File IDs are required and have to be 8 or 12 characters long.")
         return
     }
-
+    */  
     try {
         showLoading()
         const creatives = await fetchCreatives(designFileId)

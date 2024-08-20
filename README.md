@@ -1,16 +1,11 @@
 ![Logo](https://github.com/celtra/birdsOfPrey/blob/master/assets/icon128.png)
 
-Falcon to Eagle Design File migration extension with quite some known limitations 😅
-
-![Usage](https://github.com/celtra/birdsOfPrey/blob/master/assets/falcon_to_eagle_migration.gif)
+PSD Plugin to Eagle Design File extension. It's not pretty but it works!
 
 # TODO
-    - special control characters (no break, etc.) don't transfer okay
-    - proper handling of choice components (once they are supported in Eagle)
-    - anchoring?
-
+    - Support for retina/non retina? (plugin limitation?)
 # Installation
-The extension is not (yet) published on the Chrome Web Store. You can download the [ZIP](https://drive.google.com/file/d/1deo_b8cliPp8AZ2w6N8ax5-sSB67nW8h/view?usp=drive_link) (studio) or clone the [repo from GitHub](https://github.com/celtra/birdsOfPrey) (devs) and manually install the extension by following these steps:
+The extension is not (yet) published on the Chrome Web Store. You can download the [ZIP](https://drive.google.com/file/d/1deo_b8cliPp8AZ2w6N8ax5-sSB67nW8h/view?usp=drive_link) (studio) or clone the [repo from GitHub](https://github.com/daveyclayton/dodo) (devs) and manually install the extension by following these steps:
 1. Open the Google Chrome browser.
 2. Navigate to `chrome://extensions`
 3. Make sure that Developer mode is turned on.
@@ -26,20 +21,13 @@ Step 5.
 # Usage
 1. Install the extension.
 2. When you first open it, the options page will show up. Follow the instructions and enter the API App details.
-3. Enter the Falcon Design File ID you want to migrate and the destination account ID where the Eagle Design File should be created. Click migrate 🚀
-4. Check the created Eagle Design File and adjust it to be pixel perfect. Please note the Known limitations of the migration extension listed below.
-5. If something does not work, you are encountering issues, or you would like to submit a suggestion (perhaps a missing feature not listed in Known limitations or something else), please post to the `#birds-of-prey` slack channel.
-6. You can update the API App details by right-clicking the extension icon and clicking the 'Options' menu item.
+3. Use the Celtra PSD exporter plugin available from Adobe Creative Cloud to export your PSD to layers and JSON
+4. Open the PSD sync folder
+5. Open the file [PSD name].layout and copy the contents
+6. Paste the contents into the "Plugin JSON" field in the Chrome extension
+7. Paste the desired Celtra account ID to import the design file into
+8. Check the created Eagle Design File and adjust it to be pixel perfect. Please note the Known limitations of the migration extension listed below.
+9. If something does not work, you are encountering issues, or you would like to submit a suggestion (perhaps a missing feature not listed in Known limitations or something else), please post to the `#birds-of-prey` slack channel.
+10. You can update the API App details by right-clicking the extension icon and clicking the 'Options' menu item.
 
 NOTE: if you close the extension while the migration is in progress the migration will stop.
-
-# Known limitations:
-    - No support for Facebook Carousel
-    - Interactive HTML will not transfer events, actions, unsupported components (Swipey), and will only transfer the Start screen
-    - No Animations (videos will be transferred over with component clip set from 0 to scene duration)
-    - Choice component outcomes will be transferred as regular groups until Eagle supports Choices
-    - No Feeds
-    - No Auto-layout
-    - No HTML fallback image
-    - No Highlight styles
-    - No letter spacing

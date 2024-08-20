@@ -1,21 +1,21 @@
 {
-  "name": "birdsOfPrey",
-  "version": "2.2.0",
-  "description": "Morphing Falcons into Eagles. Celtra CA v1 to v2 migration extension.",
+  "name": "dodo",
+  "version": "1.0.0",
+  "description": "It's old news, but people still want it. Celtra PSD plugin to Celtra v2 import extension.",
   "main": "index.js",
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/celtra/birdsOfPrey.git"
+    "url": "git+https://github.com/daveyclayton/dodo.git"
   },
   "author": "Matic Tribuson",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/celtra/birdsOfPrey/issues"
+    "url": "https://github.com/celtra/dodo/issues"
   },
-  "homepage": "https://github.com/celtra/birdsOfPrey#readme",
+  "homepage": "https://github.com/celtra/dodo#readme",
   "devDependencies": {
     "eslint": "^8.56.0"
   }
