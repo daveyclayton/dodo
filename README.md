@@ -1,4 +1,4 @@
-![Logo](https://github.com/celtra/birdsOfPrey/blob/master/assets/icon128.png)
+![Logo](https://github.com/daveyclayton/dodo/blob/master/assets/icon128.png)
 
 PSD Plugin to Eagle Design File extension. It's not pretty but it works!
 
