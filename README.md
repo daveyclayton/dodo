@@ -1,6 +1,6 @@
 ![Logo](https://github.com/daveyclayton/dodo/blob/master/assets/icon128.png)
 
-PSD Plugin to Eagle Design File extension. It's not pretty but it works!
+A Chrome extension that takes the JSON from Celtra PSD Plugin and imports it to a new Celtra 2.0 Design File.
 
 # TODO
     - Support for retina/non retina? (plugin limitation?)
