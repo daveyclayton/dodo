@@ -3,6 +3,7 @@
 A Chrome extension that takes the JSON from Celtra PSD Plugin and imports it to a new Celtra 2.0 Design File.
 
 # TODO
+    - Add local file upload support
     - Support for retina/non retina? (plugin limitation?)
 # Installation
 The extension is not (yet) published on the Chrome Web Store. You can download the [ZIP](https://drive.google.com/file/d/1deo_b8cliPp8AZ2w6N8ax5-sSB67nW8h/view?usp=drive_link) (studio) or clone the [repo from GitHub](https://github.com/daveyclayton/dodo) (devs) and manually install the extension by following these steps:
