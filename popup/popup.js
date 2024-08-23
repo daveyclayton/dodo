@@ -3,12 +3,14 @@ import {
     createDesignFile,
     fetchFonts,
     fetchFalconDesignFile,
+    sendFilesToStorage
 } from "../shared/celtraApi.js"
 import { generateZip } from "../shared/designFileGeneration.js"
 import { getSync } from "../shared/storage.js"
 import { getCredentials, getExtensionInfo, logExtensionInfo } from "../shared/utils.js"
 
 const designFileInput = document.getElementById("design-file-id")
+const imageFilesInput = document.getElementById("image-files-input")
 const accountInput = document.getElementById("account-id")
 
 function init () {
@@ -95,6 +97,7 @@ async function migrate () {
     */  
     try {
         showLoading()
+        const blobs = await sendFilesToStorage(imageFilesInput.files)
         const creatives = await fetchCreatives(designFileId)
         const falconDesignFile = await fetchFalconDesignFile(designFileId)
         const platformFonts = await fetchFonts(falconDesignFile.accountId)

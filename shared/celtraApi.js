@@ -464,6 +464,21 @@ export async function fetchFonts (accountId) {
     }
 }
 
+export async function sendFilesToStorage (files){
+//alert(files.length)
+  for (var i=0; i<files.length;i++){
+    //alert(files[i])
+      try {
+        await dispatch ('blobs/', "POST", files[i], [["Content-Type", "application/octet-stream"]], false)
+      } catch (error) {
+        
+        throw new Error(`Failed to send blob to storage \n ${error}`)
+    }
+  }
+
+}
+
+
 export async function fetchBlob (blobhash) {
     try {
         return await dispatch(`blobs/${blobhash}`, "GET", null, [], true)
